@@ -1,0 +1,61 @@
+#!/usr/bin/env bash
+# +------------------------------------------+
+# |           Tezos oxymeter helper          |
+# +------------------------------------------+
+# | Usage: create a bridge between a local   |
+# |        port with a smartpower connected  |
+# |        to a remote computer.             |
+# +------------------------------------------+
+
+set -e
+
+## Argument guard
+if [ $# -lt 2 ]
+then
+  printf "TEZOS-OXYMETER GATEWAY\n\n"
+  printf "Create a bridge between localhost port and smartpowers ip. \n"
+  printf "USAGE: gatway [up | down] ssh_addr {smartpower ip list}\n"
+  exit 0
+fi
+
+
+## Vars
+OXYPATH="/tmp/oxymeter-store"
+
+
+## Init connections
+if [ $1 = "up" ]
+then
+  OXYPORT=50500
+  IP_LIST=${@:3}
+
+  printf "[PATH] Create $OXYPATH\n"
+  mkdir -p $OXYPATH
+
+  for IP in $IP_LIST; do
+
+    printf "[GATEWAY $2 | Up]\n"
+    printf "* Forwarding from localhost:$OXYPORT to $IP:23\n"
+    printf "* Create ssh socket $OXYPATH/socket-$IP-$2\n\n"
+
+    ssh -fNT -L "$OXYPORT:$IP:23" -S "$OXYPATH/socket-$IP-$2" -M $2
+    OXYPORT=$(( $OXYPORT + 1))
+  done
+fi
+
+
+## Close connections
+if [ $1 = "down" ]
+then
+  IP_LIST=${@:3}
+
+  for IP in $IP_LIST; do
+
+    printf "[GATEWAY $2 | Down]\n"
+    printf "* Delete ssh socket $OXYPATH/socket-$IP-$2\n"
+
+    ssh -S "$OXYPATH/socket-$IP-$2" -O exit $2
+  done
+
+  rmdir $OXYPATH
+fi
