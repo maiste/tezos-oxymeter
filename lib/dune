@@ -1,0 +1,3 @@
+(library
+  (name tezos_oxymeter)
+  (libraries re yojson lwt lwt.unix))
