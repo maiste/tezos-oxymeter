@@ -4,7 +4,11 @@ module Blind : sig
   val observe : unit -> Yojson.t Lwt.t
 end
 
-type observer = Smartpower of Smartpower.station Lwt.t | Blind
+module Mock : sig
+  val observe : unit -> Yojson.t Lwt.t
+end
+
+type observer = Smartpower of Smartpower.station Lwt.t | Mock | Blind
 
 val observe : observer -> Yojson.t Lwt.t
 
