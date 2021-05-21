@@ -1,0 +1,30 @@
+opam-version: "2.0"
+
+name: "tezos_oxymeter"
+version: "~dev"
+
+synopsis: "Library to gather information about consumption"
+description:
+"""
+Gather informations about consumption from smartpowers and msr registers.
+"""
+
+maintainer: ["etienne.marais@nomadic-labs.com"]
+authors: ["etienne.marais@nomadic-labs.com"]
+license: "MIT"
+
+homepage: "https://gitlab.com/maiste/tezos-oxymeter"
+bug-reports: "https://gitlab.com/maiste/tezos-oxymeter/-/issues"
+dev-repo: "git+https://gitlab.com/maiste/tezos-oxymeter.git"
+
+depends: [
+  "ocaml"    {>= "4.08"}
+  "dune"     {>= "1.7"}
+  "lwt"
+  "re"
+  "yojson"   {>= "1.5.0"}
+]
+
+build: [
+  ["dune" "build" "-p" name "-j" jobs]
+]
