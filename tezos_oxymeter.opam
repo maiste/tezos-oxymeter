@@ -19,7 +19,7 @@ dev-repo: "git+https://gitlab.com/maiste/tezos-oxymeter.git"
 
 depends: [
   "ocaml"    {>= "4.08"}
-  "dune"     {>= "1.7"}
+  "dune"     {>= "1.11"}
   "lwt"
   "re"
   "yojson"   {>= "1.5.0"}
