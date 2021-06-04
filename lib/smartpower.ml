@@ -16,9 +16,21 @@ let delete sock = sock >|= fun sock -> shutdown sock SHUTDOWN_ALL
 
 let float_re = Re.Str.regexp "[0-9]+[.][0-9]+"
 
+let filter_raw str =
+  let buf = Buffer.create 512 in
+  let char_stream = Stream.of_string str in
+  let rec fill_buffer () =
+    match Stream.next char_stream with
+    | '\r' | '\n' | (exception Stream.Failure) -> Buffer.contents buf
+    | c ->
+        Buffer.add_char buf c ;
+        fill_buffer ()
+  in
+  fill_buffer ()
+
 let filter raw_data =
   let splitted_raw_data =
-    String.split_on_char ',' raw_data |> List.map String.trim
+    filter_raw raw_data |> String.split_on_char ',' |> List.map String.trim
   in
   let length = List.length splitted_raw_data in
   if length <> 4 then
