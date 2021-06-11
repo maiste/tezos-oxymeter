@@ -27,7 +27,7 @@ depends: [
 ]
 
 pin-depends: [
- ["mammut.dev" "git+https://gitlab.com/mathiasbourgoin/ocaml_mammut.git"]
+ ["mammut.dev" "git+https://github.com/mathiasbourgoin/ocaml_mammut.git#opamify"]
 ]
 
 build: [
