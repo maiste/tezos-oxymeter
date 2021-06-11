@@ -1,4 +1,5 @@
 module Smartpower = Smartpower
+module Mammut = Mammut_oxymeter
 
 module Blind = struct
   let observe () =
@@ -26,11 +27,16 @@ module Mock = struct
     Lwt.return json
 end
 
-type observer = Smartpower of Smartpower.station Lwt.t | Mock | Blind
+type observer =
+  | Smartpower of Smartpower.station Lwt.t
+  | Mock
+  | Blind
+  | Mammut of string option
 
 let observe = function
   | Smartpower smartpower -> Smartpower.observe smartpower
   | Mock -> Mock.observe ()
   | Blind -> Blind.observe ()
+  | Mammut _ -> Mammut.observe ()
 
 let to_string = Yojson.show

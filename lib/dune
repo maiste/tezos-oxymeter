@@ -1,4 +1,4 @@
 (library
   (public_name tezos_oxymeter)
   (name tezos_oxymeter)
-  (libraries re yojson lwt lwt.unix))
+  (libraries re yojson lwt lwt.unix mammut))
