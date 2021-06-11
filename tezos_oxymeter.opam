@@ -19,10 +19,15 @@ dev-repo: "git+https://gitlab.com/maiste/tezos-oxymeter.git"
 
 depends: [
   "ocaml"    {>= "4.08"}
-  "dune"     {>= "1.11"}
+  "dune"     {>= "2.0"}
   "lwt"
   "re"
   "yojson"   {>= "1.5.0"}
+  "mammut"
+]
+
+pin-depends: [
+ ["mammut.dev" "git+https://gitlab.com/mathiasbourgoin/ocaml_mammut.git"]
 ]
 
 build: [
