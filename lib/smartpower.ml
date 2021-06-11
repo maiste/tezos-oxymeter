@@ -72,10 +72,11 @@ let observe sock =
   let* energy_data = observe_raw sock in
   let energy_array = Array.of_list energy_data in
   let time = ("time", time) in
+  let joule = ("joule", energy_array.(3) *. 3600.) in
   let volt = ("tension", energy_array.(0)) in
   let ampere = ("ampere", energy_array.(1)) in
   let power = ("power", energy_array.(2)) in
   let watt_hour = ("watt_hour", energy_array.(3)) in
-  let energy_report = [ time; volt; ampere; power; watt_hour ] in
+  let energy_report = [ time; joule; volt; ampere; power; watt_hour ] in
   let energy_report_json = json_of_report energy_report in
   Lwt.return energy_report_json

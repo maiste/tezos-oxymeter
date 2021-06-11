@@ -16,6 +16,7 @@ module Mock = struct
       `Assoc
         [ ("type", `Int 2);
           ("time", `Float time);
+          ("joule", `Float (Random.float 8200.0));
           ("tension", `Float (Random.float 5.0));
           ("ampere", `Float (Random.float 4.0));
           ("power", `Float (Random.float 0.20));
