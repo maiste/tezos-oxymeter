@@ -6,9 +6,4 @@
                     -cclib -lsmartgauge
                     -cclib -lusb-1.0
                     -cclib -lmammut))
-  (foreign_archives
-    ../ocaml_mammut/src/c/mammut
-    ../ocaml_mammut/src/c/usb-1.0
-    ../ocaml_mammut/src/c/smartgauge
-    ../ocaml_mammut/src/c/raplcap-msr)
   (libraries tezos_oxymeter))
