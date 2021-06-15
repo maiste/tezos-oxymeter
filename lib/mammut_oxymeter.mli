@@ -1,1 +1,1 @@
-val observe : unit -> Yojson.t Lwt.t
+val observe : unit -> Report.t Lwt.t

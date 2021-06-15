@@ -1,11 +1,12 @@
 module Smartpower = Smartpower
 module Mammut = Mammut_oxymeter
+module Report = Report
 
 module Blind = struct
   let observe () =
     let time = Unix.gettimeofday () in
-    let json = `Assoc [ ("type", `Int 0); ("time", `Float time) ] in
-    Lwt.return json
+    let report = Report.create time in
+    Lwt.return report
 end
 
 module Mock = struct
@@ -13,30 +14,27 @@ module Mock = struct
 
   let observe () =
     let time = Unix.gettimeofday () in
-    let json =
-      `Assoc
-        [ ("type", `Int 2);
-          ("time", `Float time);
-          ("joule", `Float (Random.float 8200.0));
-          ("tension", `Float (Random.float 5.0));
-          ("ampere", `Float (Random.float 4.0));
-          ("power", `Float (Random.float 0.20));
-          ("watt_hour", `Float (Random.float 0.50))
-        ]
-    in
-    Lwt.return json
+    let joule = Random.float 8200.0 in
+    let volt = Random.float 5.0 in
+    let ampere = Random.float 4.0 in
+    let power = Random.float 0.2 in
+    let watt_hour = Random.float 0.5 in
+    let report = Report.create ~joule ~volt ~ampere ~power ~watt_hour time in
+    Lwt.return report
 end
 
 type observer =
-  | Smartpower of Smartpower.station Lwt.t
-  | Mock
   | Blind
+  | Mock
+  | Smartpower of Smartpower.station Lwt.t
   | Mammut of string option
 
 let observe = function
-  | Smartpower smartpower -> Smartpower.observe smartpower
-  | Mock -> Mock.observe ()
   | Blind -> Blind.observe ()
   | Mammut _ -> Mammut.observe ()
+  | Smartpower smartpower -> Smartpower.observe smartpower
+  | Mock -> Mock.observe ()
 
-let to_string = Yojson.show
+let to_string report =
+  Report.json_of_t report
+  |> Data_encoding.Json.to_string ~newline:true ~minify:false

@@ -1,19 +1,20 @@
 module Smartpower = Smartpower
+module Report = Report
 
 module Blind : sig
-  val observe : unit -> Yojson.t Lwt.t
+  val observe : unit -> Report.t Lwt.t
 end
 
 module Mock : sig
-  val observe : unit -> Yojson.t Lwt.t
+  val observe : unit -> Report.t Lwt.t
 end
 
 type observer =
-  | Smartpower of Smartpower.station Lwt.t
-  | Mock
   | Blind
+  | Mock
+  | Smartpower of Smartpower.station Lwt.t
   | Mammut of string option
 
-val observe : observer -> Yojson.t Lwt.t
+val observe : observer -> Report.t Lwt.t
 
-val to_string : Yojson.t -> string
+val to_string : Report.t -> string
