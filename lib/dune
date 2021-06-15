@@ -2,4 +2,10 @@
   (public_name tezos_oxymeter)
   (name tezos_oxymeter)
   (flags (:standard -w -49 -linkall))
-  (libraries re yojson lwt lwt.unix mammut mammut.generated))
+  (libraries re
+             yojson
+             lwt
+             lwt.unix
+             mammut
+             mammut.generated
+             data-encoding))

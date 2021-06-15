@@ -24,6 +24,8 @@ depends: [
   "re"
   "yojson"   {>= "1.5.0"}
   "mammut"
+
+  "data-encoding"
 ]
 
 pin-depends: [
