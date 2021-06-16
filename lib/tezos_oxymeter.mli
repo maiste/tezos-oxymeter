@@ -18,3 +18,5 @@ type observer =
 val observe : observer -> Report.t Lwt.t
 
 val to_string : Report.t -> string
+
+val pp : Format.formatter -> observer -> unit

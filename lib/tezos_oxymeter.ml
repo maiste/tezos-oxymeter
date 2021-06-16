@@ -31,10 +31,16 @@ type observer =
 
 let observe = function
   | Blind -> Blind.observe ()
+  | Mock -> Mock.observe ()
   | Mammut _ -> Mammut.observe ()
   | Smartpower smartpower -> Smartpower.observe smartpower
-  | Mock -> Mock.observe ()
 
 let to_string report =
   Report.json_of_t report
   |> Data_encoding.Json.to_string ~newline:true ~minify:false
+
+let pp ppf = function
+  | Blind -> Format.fprintf ppf "blind"
+  | Mock -> Format.fprintf ppf "mock"
+  | Smartpower _ -> Format.fprintf ppf "smartpower"
+  | Mammut _ -> Format.fprintf ppf "mammut"
