@@ -1,7 +1,5 @@
 module Smartpower = Smartpower
 
-module Mammut = Mammut_oxymeter
-
 module Blind = struct
   let observe () =
     let time = Unix.gettimeofday () in
@@ -27,12 +25,10 @@ type observer =
   | Blind
   | Mock
   | Smartpower of Smartpower.station Lwt.t
-  | Mammut of string option
 
 let create = function
   | [] | ["off"] -> Blind
   | ["mock"] -> Mock
-  | ["msr"] -> Mammut None
   | ["power" ; host ; port ] ->
       let port = match int_of_string_opt port with
       | Some port -> port
@@ -45,7 +41,6 @@ let create = function
 let observe = function
   | Blind -> Blind.observe ()
   | Mock -> Mock.observe ()
-  | Mammut _ -> Mammut.observe ()
   | Smartpower smartpower -> Smartpower.observe smartpower
 
 let to_string report =
@@ -56,4 +51,3 @@ let pp ppf = function
   | Blind -> Format.fprintf ppf "blind"
   | Mock -> Format.fprintf ppf "mock"
   | Smartpower _ -> Format.fprintf ppf "smartpower"
-  | Mammut _ -> Format.fprintf ppf "mammut"

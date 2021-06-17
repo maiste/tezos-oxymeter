@@ -12,6 +12,4 @@
              yojson
              lwt
              lwt.unix
-             mammut
-             mammut.generated
              data-encoding))

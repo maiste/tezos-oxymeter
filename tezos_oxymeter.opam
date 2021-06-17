@@ -16,7 +16,6 @@ depends: [
   "re"
   "yojson" {>= "1.5.0"}
   "data-encoding" {>= "0.4"}
-  "mammut"
   "odoc" {with-doc}
 ]
 build: [
@@ -34,6 +33,3 @@ build: [
   ]
 ]
 dev-repo: "git+https://gitlab.com/maiste/tezos-oxymeter.git"
-pin-depends: [
- ["mammut.dev" "git+https://github.com/mathiasbourgoin/ocaml_mammut.git#opamify"]
-]

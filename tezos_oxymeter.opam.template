@@ -1,3 +1,0 @@
-pin-depends: [
- ["mammut.dev" "git+https://github.com/mathiasbourgoin/ocaml_mammut.git#opamify"]
-]

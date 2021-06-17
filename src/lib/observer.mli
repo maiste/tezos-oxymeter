@@ -1,9 +1,6 @@
 (** Wrapper for the {!Smartpower} module .*)
 module Smartpower = Smartpower
 
-(** Wrapper for the {!Mammut_oxymeter} module *)
-module Mammut = Mammut_oxymeter
-
 (** Module that represents an observation without any metric returned. *)
 module Blind : sig
   (** [observe ()] generates a blank report. *)
@@ -22,7 +19,6 @@ type observer =
   | Mock  (** Return a report with random numbers. For test purpose.*)
   | Smartpower of Smartpower.station Lwt.t
       (** Return a report from smartpower. *)
-  | Mammut of string option  (** Return a report from MSR registers. *)
 
 (** Create an observer from an argument list. *)
 val create : string list -> observer

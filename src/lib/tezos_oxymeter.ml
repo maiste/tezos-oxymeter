@@ -25,4 +25,3 @@
 
 module Report = Report
 module Observer = Observer
-

@@ -21,7 +21,6 @@
    re
    (yojson (>= 1.5.0))
    (data-encoding (>= 0.4))
-   mammut
    (odoc :with-doc))
 )
 
