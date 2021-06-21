@@ -9,7 +9,7 @@ val create :
   float ->
   t
 
-val encode : t Data_encoding.t
+val encoding : t Data_encoding.t
 
 val pp : Format.formatter -> t -> unit
 

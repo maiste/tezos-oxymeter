@@ -11,7 +11,7 @@ let create ?(joule = 0.0) ?(volt = 0.0) ?(ampere = 0.0) ?(power = 0.0)
     ?(watt_hour = 0.0) time =
   { time; joule; volt; ampere; power; watt_hour }
 
-let encode =
+let encoding =
   let open Data_encoding in
   conv
     (fun { time; joule; volt; ampere; power; watt_hour } ->
@@ -28,11 +28,11 @@ let encode =
 
 let pp ppf t =
   let json_str =
-    Data_encoding.Json.construct encode t
+    Data_encoding.Json.construct encoding t
     |> Data_encoding.Json.to_string ~newline:true ~minify:false
   in
   Format.fprintf ppf "%s" json_str
 
 let json_of_t t =
   let open Data_encoding in
-  Json.construct encode t
+  Json.construct encoding t
