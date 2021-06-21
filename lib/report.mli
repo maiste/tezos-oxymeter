@@ -11,4 +11,6 @@ val create :
 
 val encode : t Data_encoding.t
 
+val pp : Format.formatter -> t -> unit
+
 val json_of_t : t -> Data_encoding.json

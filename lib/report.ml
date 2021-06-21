@@ -26,6 +26,13 @@ let encode =
        (req "power" float)
        (req "watt_hour" float))
 
+let pp ppf t =
+  let json_str =
+    Data_encoding.Json.construct encode t
+    |> Data_encoding.Json.to_string ~newline:true ~minify:false
+  in
+  Format.fprintf ppf "%s" json_str
+
 let json_of_t t =
   let open Data_encoding in
   Json.construct encode t
