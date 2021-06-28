@@ -6,4 +6,4 @@
                     -cclib -lsmartgauge
                     -cclib -lusb-1.0
                     -cclib -lmammut))
-  (libraries tezos_oxymeter))
+  (libraries tezos_oxymeter.lib))
