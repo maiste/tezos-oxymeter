@@ -1,0 +1,7 @@
+(library
+  (public_name tezos_oxymeter.ppx)
+  (name ppx_oxymeter)
+  (kind ppx_rewriter)
+  (libraries tezos_oxymeter ppxlib)
+  (preprocess (pps ppxlib.metaquot)))
+
