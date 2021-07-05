@@ -23,9 +23,9 @@
 (*                                                                           *)
 (*****************************************************************************)
 
+module Report = Report
 module Smartpower = Smartpower
 module Mammut = Mammut_oxymeter
-module Report = Report
 
 module Blind = struct
   let observe () =
@@ -69,3 +69,5 @@ let pp ppf = function
   | Mock -> Format.fprintf ppf "mock"
   | Smartpower _ -> Format.fprintf ppf "smartpower"
   | Mammut _ -> Format.fprintf ppf "mammut"
+
+module Metrics = Metrics

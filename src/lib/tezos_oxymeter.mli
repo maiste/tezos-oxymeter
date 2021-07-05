@@ -26,11 +26,11 @@
 (** Main module for the [Tezos_oxymeter]. It exposes the different modules and
     wrap the behaviour for the energy consumption observation. *)
 
-(** Wrapper for the {!Smartpower} module .*)
-module Smartpower = Smartpower
-
 (** Wrapper for the {!Report} module. *)
 module Report = Report
+
+(** Wrapper for the {!Smartpower} module .*)
+module Smartpower = Smartpower
 
 (** Module that represents an observation without any metric returned. *)
 module Blind : sig
@@ -60,3 +60,6 @@ val to_string : Report.t -> string
 
 (** [pp ppf observer] is used to pretty print an {!observer}. *)
 val pp : Format.formatter -> observer -> unit
+
+(** Module to manage metrics capture. *)
+module Metrics = Metrics
