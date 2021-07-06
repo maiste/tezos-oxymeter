@@ -32,30 +32,27 @@ end
 
 let build_new_archive_table () =
   let module JSON = Utils.JSON in
-  let json =
-    match JSON.parse_metrics_config () with
-    | Some json -> json
-    | None -> raise Not_found
-    (* TODO: improve error *)
-  in
-  let files_list = JSON.extract_from_obj json in
-  let files = Hashtbl.create (List.length files_list) in
-  let () =
-    List.iter
-      (fun (file, value) ->
-        let functions_list = JSON.extract_from_array value in
-        let functions = Hashtbl.create (List.length functions_list) in
-        let () =
-          List.iter
-            (fun fun_name ->
-              let fun_name = JSON.extract_from_string fun_name in
-              Hashtbl.add functions fun_name (Queue.create ()))
-            functions_list
-        in
-        Hashtbl.add files file functions)
-      files_list
-  in
-  files
+  match JSON.parse_metrics_config () with
+  | None -> Hashtbl.create 0
+  | Some json ->
+      let files_list = JSON.extract_from_obj json in
+      let files = Hashtbl.create (List.length files_list) in
+      let () =
+        List.iter
+          (fun (file, value) ->
+            let functions_list = JSON.extract_from_array value in
+            let functions = Hashtbl.create (List.length functions_list) in
+            let () =
+              List.iter
+                (fun fun_name ->
+                  let fun_name = JSON.extract_from_string fun_name in
+                  Hashtbl.add functions fun_name (Queue.create ()))
+                functions_list
+            in
+            Hashtbl.add files file functions)
+          files_list
+      in
+      files
 
 module MakeMetrics (M : MEASURE) : METRICS = struct
   type state = Start of M.t | Stop of M.t
