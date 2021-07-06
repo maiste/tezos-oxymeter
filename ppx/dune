@@ -1,0 +1,16 @@
+(library
+  (public_name ppx-tezos_oxymeter)
+  (name ppx_tezos_oxymeter)
+  (kind ppx_rewriter)
+  (libraries tezos_oxymeter
+             mammut
+             mammut.generated
+             ppxlib)
+  (flags (:standard -w -49
+                    -cclib -lstdc++
+                    -cclib -lraplcap-msr
+                    -cclib -lsmartgauge
+                    -cclib -lusb-1.0
+                    -cclib -lmammut))
+  (preprocess (pps ppxlib.metaquot)))
+

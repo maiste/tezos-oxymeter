@@ -24,3 +24,15 @@
    mammut
    (odoc :with-doc))
 )
+
+(package
+  (name ppx-tezos_oxymeter)
+  (synopsis "Ppx for Tezos-oxymeter")
+  (description "A simple ppx for tezos_oxymeter.")
+  (depends
+    (ocaml (>= 4.12.0))
+    (dune (>= 2.5))
+    ppxlib
+    tezos_oxymeter
+  ))
+

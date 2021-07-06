@@ -1,0 +1,10 @@
+pin-depends: [
+ [
+  "tezos_oxymeter.dev"
+  "git+https://gitlab.com/maiste/tezos-oxymeter.git#ppx"
+  ]
+ [
+ "mammut.dev"
+ "git+https://github.com/mathiasbourgoin/ocaml_mammut.git#opamify"
+ ]
+]
