@@ -34,6 +34,8 @@ let observe_mammut () =
   (observe obs >|= fun json -> to_string json) >|= fun str ->
   Format.printf "%s@." str
 
-let test_suite = [ observe_blind; (*observe_smart;*) observe_mock ]
-
-let () = List.iter (fun test -> Lwt_main.run @@ test ()) test_suite
+let () =
+  Lwt_main.run @@ observe_blind () ;
+  Lwt_main.run @@ observe_mock ()
+(*Lwt_main.run @@ observe_smart () ;*)
+(*Lwt_main.run @@ observe_mammut ();*)
