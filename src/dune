@@ -1,0 +1,45 @@
+(library
+  (public_name tezos_oxymeter)
+  (name tezos_oxymeter)
+  (flags (:standard -w -49
+                    -cclib -lstdc++
+                    -cclib -lusb-1.0
+                    -cclib -lraplcap-msr
+                    -cclib -lsmartgauge
+                    -cclib -lmammut
+                    -linkall))
+  (modules (:standard \ ppx_oxymeter metrics utils))
+  (libraries tezos_oxymeter.utils
+             re
+             yojson
+             lwt
+             lwt.unix
+             mammut
+             mammut.generated
+             data-encoding))
+
+(library
+  (public_name ppx-tezos_oxymeter)
+  (name ppx_oxymeter)
+  (kind ppx_rewriter)
+  (libraries tezos_oxymeter.metrics
+             ppxlib)
+  (flags (:standard -w -49))
+  (modules ppx_oxymeter)
+  (preprocess (pps ppxlib.metaquot)))
+
+(library
+  (public_name tezos_oxymeter.metrics)
+  (name metrics)
+  (modules metrics)
+  (library_flags (:standard -w -49 -linkall))
+  (libraries tezos_oxymeter.utils
+             unix
+             ezjsonm))
+
+(library
+  (public_name tezos_oxymeter.utils)
+  (name utils)
+  (modules utils)
+  (libraries ezjsonm))
+

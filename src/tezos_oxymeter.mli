@@ -60,6 +60,3 @@ val to_string : Report.t -> string
 
 (** [pp ppf observer] is used to pretty print an {!observer}. *)
 val pp : Format.formatter -> observer -> unit
-
-(** Module to manage metrics capture. *)
-module Metrics = Metrics

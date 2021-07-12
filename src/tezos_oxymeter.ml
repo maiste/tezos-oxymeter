@@ -69,5 +69,3 @@ let pp ppf = function
   | Mock -> Format.fprintf ppf "mock"
   | Smartpower _ -> Format.fprintf ppf "smartpower"
   | Mammut _ -> Format.fprintf ppf "mammut"
-
-module Metrics = Metrics
