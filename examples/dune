@@ -1,9 +1,4 @@
 (executable
   (name main)
-  (flags (:standard -w -49
-                    -cclib -lstdc++
-                    -cclib -lraplcap-msr
-                    -cclib -lsmartgauge
-                    -cclib -lusb-1.0
-                    -cclib -lmammut))
+  (flags (:standard -w -49 -cclib -lusb-1.0))
   (libraries tezos_oxymeter))
