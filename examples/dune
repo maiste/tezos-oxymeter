@@ -1,4 +1,6 @@
 (executable
   (name main)
-  (flags (:standard -w -49 -cclib -lusb-1.0))
+  (flags (:standard -w -49
+                    ;-cclib -lusb-1.0
+   ))
   (libraries tezos_oxymeter))

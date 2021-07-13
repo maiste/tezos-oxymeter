@@ -1,7 +1,7 @@
 (library
   (public_name tezos_oxymeter)
   (name tezos_oxymeter)
-  (flags (:standard -w -49
+  (library_flags (:standard -w -49
                     -cclib -lstdc++
                     -cclib -lusb-1.0
                     -cclib -lraplcap-msr
