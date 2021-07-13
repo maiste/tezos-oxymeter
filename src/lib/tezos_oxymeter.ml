@@ -23,9 +23,9 @@
 (*                                                                           *)
 (*****************************************************************************)
 
+module Report = Report
 module Smartpower = Smartpower
 module Mammut = Mammut_oxymeter
-module Report = Report
 
 module Blind = struct
   let observe () =

@@ -1,0 +1,10 @@
+#!/bin/sh
+
+if [ -d "_opam" ] ; then
+  printf "[BUILD] _opam already exists.\n"
+else
+  opam switch create . --empty
+fi
+
+eval $(opam env)
+opam install . --deps-only

@@ -1,0 +1,57 @@
+#!/bin/sh
+
+ls /usr/local/lib | grep mammut > /dev/null
+MAMMUT=$?
+
+ls /usr/local/lib | grep raplcap-msr > /dev/null
+RAPL=$?
+
+ls /usr/local/lib | grep smartgauge > /dev/null
+SMARTGAUGE=$?
+
+
+printf "[CHECK] Mammut?\n"
+if [ $MAMMUT -eq 1 ] ; then
+  printf "[INFO] Installation requested for Mammut.\n"
+  git clone https://github.com/DanieleDeSensi/mammut.git /tmp/mammut
+  cd /tmp/mammut
+  mkdir build
+  cd build
+  cmake ..
+  make
+  printf "[INSTALL] Need sudo rights to install Mammut.\n"
+  sudo make install
+  printf "[INSTALL] Installation completed.\n"
+else
+  printf "[OK] Mammut is already installed.\n"
+fi
+
+
+printf "[CHECK] Raplcap-msr?\n"
+if [ $RAPL -eq 1 ] ; then
+  printf "[INFO] Installation requested for Raplcap-msr.\n"
+  git clone https://github.com/powercap/raplcap.git /tmp/raplcap
+  cd /tmp/raplcap/
+  mkdir build
+  cd build/
+  cmake ..
+  make
+  printf "[INSTALL] Need sudo rights to install Raplcap-msr.\n"
+  sudo make install
+  printf "[INSTALL] Installation completed.\n"
+else
+  printf "[OK] Raplcap-msr is already installed.\n"
+fi
+
+
+printf "[CHECK] Smartgauge?\n"
+if [ $SMARTGAUGE -eq 1 ] ; then
+  printf "[INFO] Installation requested for Smartgauge.\n"
+  git clone https://github.com/maiste/odroid-smartpower-linux.git /tmp/odroid-smartpower-linux
+  cd /tmp/odroid-smartpower-linux/
+  printf "[INSTALL] Need sudo rights to install smartgauge.\n"
+  sudo make install
+  printf "[INSTALL] Installation completed.\n"
+else
+  printf "[OK] Smartgauge is already installed.\n"
+fi
