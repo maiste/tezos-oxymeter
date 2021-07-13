@@ -1,0 +1,18 @@
+(library
+  (public_name tezos_oxymeter)
+  (name tezos_oxymeter)
+  (flags (:standard -w -49
+                    -cclib -lstdc++
+                    -cclib -lusb-1.0
+                    -cclib -lraplcap-msr
+                    -cclib -lsmartgauge
+                    -cclib -lmammut
+                    -linkall))
+  (libraries tezos_oxymeter.utils
+             re
+             yojson
+             lwt
+             lwt.unix
+             mammut
+             mammut.generated
+             data-encoding))
