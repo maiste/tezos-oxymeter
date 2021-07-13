@@ -2,7 +2,8 @@
   (public_name ppx-tezos_oxymeter)
   (name ppx_oxymeter)
   (kind ppx_rewriter)
-  (libraries tezos_oxymeter.metrics
+  (libraries unix
+             ezjsonm
              ppxlib)
   (flags (:standard -w -49))
   (preprocess (pps ppxlib.metaquot)))

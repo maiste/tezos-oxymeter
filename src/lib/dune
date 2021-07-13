@@ -8,8 +8,7 @@
                     -cclib -lsmartgauge
                     -cclib -lmammut
                     -linkall))
-  (libraries tezos_oxymeter.utils
-             re
+  (libraries re
              yojson
              lwt
              lwt.unix

@@ -33,11 +33,12 @@ end
 let build_new_archive_table () =
   let module JSON = Utils.JSON in
   match JSON.parse_metrics_config () with
-  | None -> Hashtbl.create 0
+  | None -> Hashtbl.create 0 (* To content the type system. *)
   | Some json ->
       let files_list = JSON.extract_from_obj json in
       let files = Hashtbl.create (List.length files_list) in
       let () =
+        (* Build a hash table according to the json specification. *)
         List.iter
           (fun (file, value) ->
             let functions_list = JSON.extract_from_array value in
@@ -95,6 +96,8 @@ module MakeMetrics (M : MEASURE) : METRICS = struct
     in
     iter None []
 
+  (* This fonction can be called later to extract information as JSON
+     from the files hashtable. *)
   let generate_report () : Ezjsonm.value =
     let obj_list =
       Hashtbl.fold

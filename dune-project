@@ -33,6 +33,6 @@
     (ocaml (>= 4.12.0))
     (dune (>= 2.5))
     ppxlib
-    tezos_oxymeter
+    ezjsonm
   ))
 
