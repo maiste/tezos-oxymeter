@@ -1,4 +1,5 @@
 open Ppxlib
+open Tezos_oxymeter
 
 let wrap_expr loc expr name =
   let fun_name = Ast_builder.Default.estring ~loc name in

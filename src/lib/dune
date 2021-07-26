@@ -1,15 +1,10 @@
 (library
   (public_name tezos_oxymeter)
   (name tezos_oxymeter)
-  (library_flags (:standard -w -49
-                    -cclib -lstdc++
-                    -cclib -lusb-1.0
-                    -cclib -lraplcap-msr
-                    -cclib -lsmartgauge
-                    -cclib -lmammut
-                    -linkall))
+  (library_flags (:standard -w -49 -linkall))
   (libraries re
              yojson
+             ezjsonm
              lwt
              lwt.unix
              data-encoding))

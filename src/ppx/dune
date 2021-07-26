@@ -4,6 +4,7 @@
   (kind ppx_rewriter)
   (libraries unix
              ezjsonm
-             ppxlib)
+             ppxlib
+             tezos_oxymeter)
   (flags (:standard -w -49))
   (preprocess (pps ppxlib.metaquot)))
