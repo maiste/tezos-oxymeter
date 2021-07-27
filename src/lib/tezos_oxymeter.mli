@@ -32,3 +32,6 @@ module Report = Report
 (** Wrapper for the {!Observer} module. *)
 module Observer = Observer
 
+(** Wrapper for the {!Metrics} module. *)
+module Metrics = Metrics
+

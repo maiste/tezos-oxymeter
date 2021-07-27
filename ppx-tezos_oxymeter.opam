@@ -12,7 +12,6 @@ depends: [
   "ocaml" {>= "4.12.0"}
   "dune" {>= "2.5"}
   "ppxlib"
-  "ezjsonm"
 ]
 build: [
   ["dune" "subst"] {pinned}

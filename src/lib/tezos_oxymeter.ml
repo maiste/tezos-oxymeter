@@ -25,4 +25,5 @@
 
 module Report = Report
 module Observer = Observer
+module Metrics = Metrics
 

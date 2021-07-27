@@ -20,6 +20,7 @@
    lwt
    re
    (yojson (>= 1.5.0))
+    ezjsonm
    (data-encoding (>= 0.4))
    (odoc :with-doc))
 )
@@ -32,6 +33,5 @@
     (ocaml (>= 4.12.0))
     (dune (>= 2.5))
     ppxlib
-    ezjsonm
   ))
 
