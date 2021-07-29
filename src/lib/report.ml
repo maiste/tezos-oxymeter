@@ -36,6 +36,15 @@ let create ?(joule = 0.0) ?(volt = 0.0) ?(ampere = 0.0) ?(power = 0.0)
     ?(watt_hour = 0.0) time =
   { time; joule; volt; ampere; power; watt_hour }
 
+let diff r1 r2 =
+  { time = r1.time -. r2.time;
+    joule = r1.joule -. r2.joule;
+    volt = r1.volt -. r2.volt;
+    ampere = r1.ampere -. r2.ampere;
+    power = r1.power -. r2.power;
+    watt_hour = r1.watt_hour -. r2.watt_hour
+  }
+
 let encoding =
   let open Data_encoding in
   conv
@@ -51,13 +60,20 @@ let encoding =
        (req "power" float)
        (req "watt_hour" float))
 
+let string_of_t t =
+  let open Data_encoding in
+  Json.construct encoding t |> Json.to_string ~newline:true ~minify:false
+
 let pp ppf t =
-  let json_str =
-    Data_encoding.Json.construct encoding t
-    |> Data_encoding.Json.to_string ~newline:true ~minify:false
-  in
+  let json_str = string_of_t t in
   Format.fprintf ppf "%s" json_str
 
 let json_of_t t =
   let open Data_encoding in
   Json.construct encoding t
+
+let ezjsonm_of_t t =
+  let json_float t = `Float t in
+  let wrap_in_array lst = `A lst in
+  let t_list = [ t.time; t.joule; t.volt; t.ampere; t.power; t.watt_hour ] in
+  List.map json_float t_list |> wrap_in_array

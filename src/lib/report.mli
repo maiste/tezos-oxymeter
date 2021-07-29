@@ -48,12 +48,23 @@ val create :
   float ->
   t
 
+(**  [diff r1 r2] creates a new report which represents the difference
+      between the two reports (r1 - r2), field by field. *)
+val diff : t -> t -> t
+
 (** It provides an encoding used by tezos to transform data in JSON format. *)
 val encoding : t Data_encoding.t
 
 (** [pp ppf report] is used to pretty print the report. *)
 val pp : Format.formatter -> t -> unit
 
-(** [json_of_t report] converts a {!t} report into a Json, usable by
+(** [string_ot_t] converts {!t} report into a readable string. *)
+val string_of_t : t -> string
+
+(** [json_of_t report] converts a {!t} report into a JSON, usable by
     Data_encoding. *)
 val json_of_t : t -> Data_encoding.json
+
+(** [ezjsonm_of_t report] converts {!t} report into a JSON, usable bytes
+    Ezjsonm. *)
+val ezjsonm_of_t : t -> Ezjsonm.value
