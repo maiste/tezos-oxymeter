@@ -3,6 +3,9 @@ module type MEASURE = sig
   (** Abstract type to represent a measure. *)
   type t
 
+  (** Tells if a measure is wanted or not. *)
+  val wanted : unit -> bool
+
   (** Initialize the instrument. *)
   val init : string option -> unit
 
@@ -45,3 +48,6 @@ module MakeMetrics : functor (M : MEASURE) -> METRICS
 
 (** Module to gather metrics about time. *)
 module TimeMetrics : METRICS
+
+(** Module to gather metrics about consumption. *)
+module EnergyMetrics : METRICS

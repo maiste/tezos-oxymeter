@@ -46,3 +46,19 @@ module Name : sig
       a timestamp at creation time to [name]. *)
   val timestamp_name : string -> string
 end
+
+(** Module to handle argument declaration. *)
+module Args : sig
+  (** [want_time ()] returns true if the time metric is wanted. *)
+  val want_time : unit -> bool
+
+  (** [want_power ()] returns Some (energy type) if the power metric
+      is wanted. Else, it returns false. *)
+  val want_power : unit -> string option
+
+  (** Specification for a potential power argument in command line. *)
+  val power_spec : string * Arg.spec * string
+
+  (** Specification for a potential time argument in command line. *)
+  val time_spec : string * Arg.spec * string
+end

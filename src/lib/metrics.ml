@@ -3,6 +3,8 @@ open Lwt.Infix
 module type MEASURE = sig
   type t
 
+  val wanted : unit -> bool
+
   val init : string option -> unit
 
   val getMeasure : unit -> t Lwt.t
@@ -25,7 +27,11 @@ end
 module TimeMeasure : MEASURE = struct
   type t = float
 
-  let init args = ignore args
+  let flag_on = ref false
+
+  let wanted () = !flag_on
+
+  let init _args = flag_on := Utils.Args.want_time ()
 
   let getMeasure () = Unix.gettimeofday () |> Lwt.return
 
@@ -39,9 +45,19 @@ end
 module EnergyMeasure : MEASURE = struct
   type t = Report.t
 
+  let flag_on = ref false
+
+  let wanted () = !flag_on
+
   let observer = ref Observer.Blind
 
-  let init _args = failwith "TODO"
+  let init _args =
+    match Utils.Args.want_power () with
+    | None -> ()
+    | Some power ->
+        flag_on := true ;
+        let obs = Observer.create (String.split_on_char ':' power) in
+        observer := obs
 
   let getMeasure () =
     let observer = !observer in
@@ -147,3 +163,4 @@ module MakeMetrics (M : MEASURE) : METRICS = struct
 end
 
 module TimeMetrics = MakeMetrics (TimeMeasure)
+module EnergyMetrics = MakeMetrics (EnergyMeasure)

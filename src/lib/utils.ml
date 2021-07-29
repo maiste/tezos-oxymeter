@@ -43,3 +43,22 @@ module Name = struct
     let timestamp = Unix.gettimeofday () |> string_of_float in
     timestamp ^ "_" ^ name
 end
+
+module Args = struct
+  let time = ref false
+
+  let power = ref "off"
+
+  let want_time () = !time
+
+  let want_power () =
+    let power = !power in
+    if power = "off" then None else Some power
+
+  let power_spec =
+    ( "-energy",
+      Arg.Set_string power,
+      "Specify the energy source: [mock|power:<ip>:<port>]." )
+
+  let time_spec = ("-time", Arg.Set time, "Request to have time metric.")
+end

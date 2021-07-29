@@ -28,6 +28,10 @@ class oxymeter_mapper_v3 =
   end
 
 let () =
+  let (power_key, power_spec, power_doc) = Args.power_spec in
+  let (time_key, time_spec, time_doc) = Args.time_spec in
+  Driver.add_arg power_key power_spec ~doc:power_doc ;
+  Driver.add_arg time_key time_spec ~doc:time_doc ;
   let ast_mapper = new oxymeter_mapper_v3 in
   let impl = ast_mapper#structure in
   Driver.register_transformation "ppx-oxymeter" ~impl

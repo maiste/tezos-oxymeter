@@ -35,3 +35,5 @@ module Observer = Observer
 (** Wrapper for the {!Metrics} module. *)
 module Metrics = Metrics
 
+(** Wrapper for the {!Args} module. *)
+module Args = Utils.Args
