@@ -22,4 +22,24 @@ module JSON = struct
     | _ -> []
 
   let extract_from_string = Ezjsonm.get_string
+
+  let export_to ~path json =
+    let cout = open_out path in
+    let jsont = Ezjsonm.wrap json in
+    Ezjsonm.to_channel cout jsont ;
+    close_out cout
+end
+
+module Sys = struct
+  let create_opt ?(mode = 0o755) path =
+    if not (Sys.file_exists path) then Sys.mkdir path mode
+    else if not (Sys.is_directory path) then ()
+    else failwith "Can't create a directory: conflict with filename"
+  (* TODO: Improve error. *)
+end
+
+module Name = struct
+  let timestamp_name name =
+    let timestamp = Unix.gettimeofday () |> string_of_float in
+    timestamp ^ "_" ^ name
 end

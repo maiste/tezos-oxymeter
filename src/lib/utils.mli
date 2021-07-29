@@ -3,6 +3,7 @@
     [metrics_config.json]. *)
 val metrics_config_path : string
 
+(** Module to manipulate JSON file. *)
 module JSON : sig
   (** [parse_file file_path] opens the file and parses it as a JSON
         value. If there is an error during the process, it returns
@@ -26,4 +27,22 @@ module JSON : sig
   (** [extract_string] converts a [Ezjsonm.value.`String] into an
       OCaml string. *)
   val extract_from_string : Ezjsonm.value -> string
+
+  (** [export_to ~path json] writes [json] into the file
+    referenced by [path]. *)
+  val export_to : path:string -> Ezjsonm.value -> unit
+end
+
+(** Module to execute sys calls. *)
+module Sys : sig
+  (** [create_opt ~mode path] creates a directory at [path] with the [mode]
+    permissions if it doesn't already exist. *)
+  val create_opt : ?mode:int -> string -> unit
+end
+
+(** Module to manage name creation. *)
+module Name : sig
+  (** [timestamp_name name] generates a new name by adding
+      a timestamp at creation time to [name]. *)
+  val timestamp_name : string -> string
 end
