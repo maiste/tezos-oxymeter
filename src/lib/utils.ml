@@ -33,7 +33,7 @@ end
 module Sys = struct
   let create_opt ?(mode = 0o755) path =
     if not (Sys.file_exists path) then Sys.mkdir path mode
-    else if not (Sys.is_directory path) then ()
+    else if Sys.is_directory path then ()
     else failwith "Can't create a directory: conflict with filename"
   (* TODO: Improve error. *)
 end

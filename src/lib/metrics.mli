@@ -3,6 +3,9 @@ module type MEASURE = sig
   (** Abstract type to represent a measure. *)
   type t
 
+  (** The name of file where the measure are exported. *)
+  val file : string
+
   (** Tells if a measure is wanted or not. *)
   val wanted : unit -> bool
 

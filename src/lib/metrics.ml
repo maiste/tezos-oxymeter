@@ -3,6 +3,8 @@ open Lwt.Infix
 module type MEASURE = sig
   type t
 
+  val file : string
+
   val wanted : unit -> bool
 
   val init : string option -> unit
@@ -27,6 +29,8 @@ end
 module TimeMeasure : MEASURE = struct
   type t = float
 
+  let file = "time.json"
+
   let flag_on = ref false
 
   let wanted () = !flag_on
@@ -44,6 +48,8 @@ end
 
 module EnergyMeasure : MEASURE = struct
   type t = Report.t
+
+  let file = "energy"
 
   let flag_on = ref false
 
@@ -160,6 +166,10 @@ module MakeMetrics (M : MEASURE) : METRICS = struct
     global_report >|= fun global_report ->
     let global_report = `O global_report in
     Utils.JSON.export_to ~path:json_path global_report
+
+  let () =
+    at_exit (fun () ->
+        if M.wanted () then generate_report M.file |> Lwt_main.run)
 end
 
 module TimeMetrics = MakeMetrics (TimeMeasure)
