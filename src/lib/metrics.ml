@@ -1,33 +1,57 @@
+open Lwt.Infix
+
 module type MEASURE = sig
   type t
 
-  val getMeasure : unit -> t
+  val init : string option -> unit
 
-  val diff : t -> t -> t
+  val getMeasure : unit -> t Lwt.t
 
-  val to_string : t -> string
+  val diff : t -> t -> t Lwt.t
 
-  val to_json : t -> Ezjsonm.value
+  val to_string_lwt : t -> string Lwt.t
+
+  val to_ezjsonm_lwt : t -> Ezjsonm.value Lwt.t
 end
 
 module type METRICS = sig
-  val insert : string -> string -> [< `Start | `Stop ] -> unit
+  val insert : string -> string -> [< `Start | `Stop ] -> unit Lwt.t
 
   val exist : string -> string -> bool
 
-  val generate_report : unit -> Ezjsonm.value
+  val generate_report : ?path:string -> string -> unit Lwt.t
 end
 
 module TimeMeasure : MEASURE = struct
   type t = float
 
-  let getMeasure () = Unix.gettimeofday ()
+  let init args = ignore args
 
-  let diff x y = x -. y
+  let getMeasure () = Unix.gettimeofday () |> Lwt.return
 
-  let to_string = string_of_float
+  let diff x y = Lwt.return (x -. y)
 
-  let to_json t = `Float t
+  let to_string_lwt t = Lwt.return (string_of_float t)
+
+  let to_ezjsonm_lwt t = Lwt.return (`Float t)
+end
+
+module EnergyMeasure : MEASURE = struct
+  type t = Report.t
+
+  let observer = ref Observer.Blind
+
+  let init _args = failwith "TODO"
+
+  let getMeasure () =
+    let observer = !observer in
+    Observer.observe observer
+
+  let diff r1 r2 = Lwt.return (Report.diff r1 r2)
+
+  let to_ezjsonm_lwt t = Lwt.return (Report.ezjsonm_of_t t)
+
+  let to_string_lwt t = Lwt.return (Report.string_of_t t)
 end
 
 let build_new_archive_table () =
@@ -63,10 +87,9 @@ module MakeMetrics (M : MEASURE) : METRICS = struct
   let files : (string, functions) Hashtbl.t = build_new_archive_table ()
 
   let insert file fun_name state =
-    let metric =
-      let measure = M.getMeasure () in
-      match state with `Start -> Start measure | `Stop -> Stop measure
-    in
+    ( M.getMeasure () >|= fun measure ->
+      match state with `Start -> Start measure | `Stop -> Stop measure )
+    >|= fun metric ->
     match Hashtbl.find_opt files file with
     | Some functions -> (
         match Hashtbl.find_opt functions fun_name with
@@ -86,35 +109,41 @@ module MakeMetrics (M : MEASURE) : METRICS = struct
         let state = Queue.pop track in
         match (last_start, state) with
         | (Some start, Stop stop) ->
-            let diff = M.diff stop start in
-            let json = M.to_json diff in
+            acc >>= fun acc ->
+            M.diff stop start >>= fun diff ->
+            M.to_ezjsonm_lwt diff >>= fun json ->
             let acc = json :: acc in
-            iter None acc
+            iter None (Lwt.return acc)
         | (None, Start start) -> iter (Some start) acc
         | _ -> iter last_start acc
       else acc
     in
-    iter None []
+    iter None (Lwt.return [])
 
   (* This fonction can be called later to extract information as JSON
      from the files hashtable. *)
-  let generate_report () : Ezjsonm.value =
-    let obj_list =
-      Hashtbl.fold
-        (fun file functions report ->
-          let obj_list =
-            Hashtbl.fold
-              (fun fun_name track report ->
-                let metric_list = extract_from_states track in
-                (fun_name, `A metric_list) :: report)
-              functions
-              []
-          in
-          (file, `O obj_list) :: report)
-        files
-        []
+  let generate_report ?(path = "/tmp/oxymeter-report/") name =
+    let () = Utils.Sys.create_opt path in
+    let name = Utils.Name.timestamp_name name in
+    let json_path = path ^ name in
+    let build_local_report fun_name track report =
+      report >>= fun report ->
+      extract_from_states track >>= fun metric_list ->
+      Lwt.return ((fun_name, `A metric_list) :: report)
     in
-    `O obj_list
+    let global_report =
+      Hashtbl.fold
+        (fun file functions global_report ->
+          Hashtbl.fold build_local_report functions (Lwt.return [])
+          >>= fun local_report ->
+          global_report >|= fun global_report ->
+          (file, `O local_report) :: global_report)
+        files
+        (Lwt.return [])
+    in
+    global_report >|= fun global_report ->
+    let global_report = `O global_report in
+    Utils.JSON.export_to ~path:json_path global_report
 end
 
 module TimeMetrics = MakeMetrics (TimeMeasure)
