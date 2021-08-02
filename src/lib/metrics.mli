@@ -39,9 +39,9 @@ module type METRICS = sig
       reference to file.fun_name in the database. *)
   val exist : string -> string -> bool
 
-  (** [generate_report name] builds a JSON report to {path}/name from the values
-      present in the database. It creates the path if it doesn't exist.contents
-      The default path is in [/tmp/oxymeter-report/]. *)
+  (** [generate_report name] builds a JSON report to [path]/name from the
+      values present in the database. It creates the path if it doesn't
+      exist. The default path is in [/tmp/oxymeter-report/]. *)
   val generate_report : ?path:string -> string -> unit
 
   val register_report_generation : unit -> unit

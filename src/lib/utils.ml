@@ -40,7 +40,16 @@ end
 
 module Name = struct
   let timestamp_name name =
-    let timestamp = Unix.gettimeofday () |> string_of_float in
+    let time = Unix.time () |> Unix.localtime in
+    let year = time.tm_year + 1900 |> string_of_int in
+    let month = time.tm_mon + 1 |> Format.sprintf "%.2d" in
+    let day = time.tm_mday |> Format.sprintf "%.2d" in
+    let hour = time.tm_hour |> string_of_int in
+    let minute = time.tm_min |> string_of_int in
+    let second = time.tm_sec |> string_of_int in
+    let timestamp =
+      year ^ month ^ day ^ "-" ^ hour ^ ":" ^ minute ^ ":" ^ second
+    in
     timestamp ^ "_" ^ name
 end
 
