@@ -2,16 +2,32 @@ open Ppxlib
 open Tezos_oxymeter
 
 let time_header loc =
+  let path =
+    Ast_builder.Default.estring ~loc (Tezos_oxymeter.Args.want_path ())
+  in
+  let name =
+    Ast_builder.Default.estring ~loc Tezos_oxymeter.Metrics.TimeMeasure.file
+  in
   ( [ [%stri
         at_exit (fun () ->
-            Tezos_oxymeter.Metrics.TimeMetrics.register_report_generation ())]
+            Tezos_oxymeter.Metrics.TimeMetrics.generate_report
+              [%e path]
+              [%e name])]
     ],
     [] )
 
 let energy_header loc =
+  let path =
+    Ast_builder.Default.estring ~loc (Tezos_oxymeter.Args.want_path ())
+  in
+  let name =
+    Ast_builder.Default.estring ~loc Tezos_oxymeter.Metrics.EnergyMeasure.file
+  in
   ( [ [%stri
         at_exit (fun () ->
-            Tezos_oxymeter.Metrics.EnergyMetrics.register_report_generation ())]
+            Tezos_oxymeter.Metrics.EnergyMetrics.generate_report
+              [%e path]
+              [%e name])]
     ],
     [] )
 
@@ -55,12 +71,17 @@ class oxymeter_mapper_v3 =
       match expr.pexp_desc with
       | Pexp_apply
           ({ pexp_desc = Pexp_ident { txt = Lident name; _ }; _ }, _args) ->
+          let expr =
+            if
+              Args.want_time ()
+              && Metrics.TimeMetrics.exist loc.loc_start.pos_fname name
+            then wrap_time_expr loc expr name
+            else expr
+          in
           if
-            Args.want_time ()
-            && Metrics.TimeMetrics.exist loc.loc_start.pos_fname name
-          then
-            let new_expr = wrap_time_expr loc expr name in
-            new_expr
+            Option.is_some (Args.want_power ())
+            && Metrics.EnergyMetrics.exist loc.loc_start.pos_fname name
+          then wrap_energy_expr loc expr name
           else expr
       | _ -> expr
   end
@@ -68,8 +89,12 @@ class oxymeter_mapper_v3 =
 let () =
   let (power_key, power_spec, power_doc) = Args.power_spec in
   let (time_key, time_spec, time_doc) = Args.time_spec in
+  let (signal_key, signal_spec, signal_doc) = Args.signal_spec in
+  let (path_key, path_spec, path_doc) = Args.path_spec in
   Driver.add_arg power_key power_spec ~doc:power_doc ;
   Driver.add_arg time_key time_spec ~doc:time_doc ;
+  Driver.add_arg signal_key signal_spec ~doc:signal_doc ;
+  Driver.add_arg path_key path_spec ~doc:path_doc ;
   let ast_mapper = new oxymeter_mapper_v3 in
   let impl = ast_mapper#structure in
   Driver.register_transformation
