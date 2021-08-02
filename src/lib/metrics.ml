@@ -19,11 +19,13 @@ module type MEASURE = sig
 end
 
 module type METRICS = sig
-  val insert : string -> string -> [< `Start | `Stop ] -> unit Lwt.t
+  val insert : string -> string -> [< `Start | `Stop ] -> unit
 
   val exist : string -> string -> bool
 
-  val generate_report : ?path:string -> string -> unit Lwt.t
+  val generate_report : ?path:string -> string -> unit
+
+  val register_report_generation : unit -> unit
 end
 
 module TimeMeasure : MEASURE = struct
@@ -109,16 +111,16 @@ module MakeMetrics (M : MEASURE) : METRICS = struct
   let files : (string, functions) Hashtbl.t = build_new_archive_table ()
 
   let insert file fun_name state =
-    ( M.getMeasure () >|= fun measure ->
-      match state with `Start -> Start measure | `Stop -> Stop measure )
-    >|= fun metric ->
-    match Hashtbl.find_opt files file with
-    | Some functions -> (
-        match Hashtbl.find_opt functions fun_name with
-        | Some track -> Queue.push metric track
-        | None -> raise Not_found)
-    | None -> raise Not_found
-  (* TODO improve error *)
+    Lwt_main.run
+    @@ ( ( M.getMeasure () >|= fun measure ->
+           match state with `Start -> Start measure | `Stop -> Stop measure )
+       >|= fun metric ->
+         match Hashtbl.find_opt files file with
+         | Some functions -> (
+             match Hashtbl.find_opt functions fun_name with
+             | Some track -> Queue.push metric track
+             | None -> raise Not_found)
+         | None -> raise Not_found )
 
   let exist file fun_name =
     match Hashtbl.find_opt files file with
@@ -163,13 +165,12 @@ module MakeMetrics (M : MEASURE) : METRICS = struct
         files
         (Lwt.return [])
     in
-    global_report >|= fun global_report ->
-    let global_report = `O global_report in
-    Utils.JSON.export_to ~path:json_path global_report
+    Lwt_main.run
+    @@ ( global_report >|= fun global_report ->
+         let global_report = `O global_report in
+         Utils.JSON.export_to ~path:json_path global_report )
 
-  let () =
-    at_exit (fun () ->
-        if M.wanted () then generate_report M.file |> Lwt_main.run)
+  let register_report_generation () = generate_report M.file
 end
 
 module TimeMetrics = MakeMetrics (TimeMeasure)

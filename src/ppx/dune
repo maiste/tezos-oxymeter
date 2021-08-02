@@ -6,5 +6,5 @@
              ezjsonm
              ppxlib
              tezos_oxymeter)
-  (flags (:standard -w -49))
+  (flags (:standard -w -49 -linkall))
   (preprocess (pps ppxlib.metaquot)))

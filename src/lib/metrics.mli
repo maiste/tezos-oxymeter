@@ -33,7 +33,7 @@ module type METRICS = sig
   (** [insert file fun_name state] inserts a new entry into
       the database, referenced as file.fun_name. It's either
       the starting of a measure or the end. *)
-  val insert : string -> string -> [< `Start | `Stop ] -> unit Lwt.t
+  val insert : string -> string -> [< `Start | `Stop ] -> unit
 
   (** [exist file fun_name] checks if there is already a
       reference to file.fun_name in the database. *)
@@ -42,7 +42,9 @@ module type METRICS = sig
   (** [generate_report name] builds a JSON report to {path}/name from the values
       present in the database. It creates the path if it doesn't exist.contents
       The default path is in [/tmp/oxymeter-report/]. *)
-  val generate_report : ?path:string -> string -> unit Lwt.t
+  val generate_report : ?path:string -> string -> unit
+
+  val register_report_generation : unit -> unit
 end
 
 (** Functor to create an instrument to get {!METRICS} from
