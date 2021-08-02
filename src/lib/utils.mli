@@ -53,12 +53,24 @@ module Args : sig
   val want_time : unit -> bool
 
   (** [want_power ()] returns Some (energy type) if the power metric
-      is wanted. Else, it returns false. *)
+      is wanted. Else, it returns None. *)
   val want_power : unit -> string option
+
+  (** [want_signal ()] returns true if a signal handler is requested. *)
+  val want_signal : unit -> bool
+
+  (** [want_path ()] returns the path value. Default is /tmp/oxymeter-report. *)
+  val want_path : unit -> string
 
   (** Specification for a potential power argument in command line. *)
   val power_spec : string * Arg.spec * string
 
   (** Specification for a potential time argument in command line. *)
   val time_spec : string * Arg.spec * string
+
+  (** Specification for a potential signal argument in command line. *)
+  val signal_spec : string * Arg.spec * string
+
+  (** Specification for a potential path argument in command line. *)
+  val path_spec : string * Arg.spec * string
 end

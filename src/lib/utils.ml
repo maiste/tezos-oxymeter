@@ -58,11 +58,19 @@ module Args = struct
 
   let power = ref "off"
 
+  let signal = ref false
+
+  let path = ref "/tmp/oxymeter-report/"
+
   let want_time () = !time
 
   let want_power () =
     let power = !power in
     if power = "off" then None else Some power
+
+  let want_signal () = !signal
+
+  let want_path () = !path
 
   let power_spec =
     ( "-energy",
@@ -70,4 +78,12 @@ module Args = struct
       "Specify the energy source: [mock|power:<ip>:<port>]." )
 
   let time_spec = ("-time", Arg.Set time, "Request to have time metric.")
+
+  let signal_spec =
+    ("-signal", Arg.Set signal, "Request to have a signal handler.")
+
+  let path_spec =
+    ( "-path",
+      Arg.Set_string path,
+      "Specify a new path for the report. Default is /tmp/oxymeter-report." )
 end

@@ -23,9 +23,7 @@ module type METRICS = sig
 
   val exist : string -> string -> bool
 
-  val generate_report : ?path:string -> string -> unit
-
-  val register_report_generation : unit -> unit
+  val generate_report : string -> string -> unit
 end
 
 module TimeMeasure : MEASURE = struct
@@ -146,10 +144,10 @@ module MakeMetrics (M : MEASURE) : METRICS = struct
 
   (* This fonction can be called later to extract information as JSON
      from the files hashtable. *)
-  let generate_report ?(path = "/tmp/oxymeter-report/") name =
+  let generate_report path name =
     let () = Utils.Sys.create_opt path in
     let name = Utils.Name.timestamp_name name in
-    let json_path = path ^ name in
+    let json_path = Filename.concat path name in
     let build_local_report fun_name track report =
       report >>= fun report ->
       extract_from_states track >>= fun metric_list ->
@@ -169,8 +167,6 @@ module MakeMetrics (M : MEASURE) : METRICS = struct
     @@ ( global_report >|= fun global_report ->
          let global_report = `O global_report in
          Utils.JSON.export_to ~path:json_path global_report )
-
-  let register_report_generation () = generate_report M.file
 end
 
 module TimeMetrics = MakeMetrics (TimeMeasure)

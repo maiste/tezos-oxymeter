@@ -27,6 +27,12 @@ module type MEASURE = sig
   val to_ezjsonm_lwt : t -> Ezjsonm.value Lwt.t
 end
 
+(** Module with informations about the energy measure. *)
+module EnergyMeasure : MEASURE
+
+(** Module with informations about the time measure .*)
+module TimeMeasure : MEASURE
+
 (** Module that represents an instrument to take and save
     mesures. *)
 module type METRICS = sig
@@ -39,12 +45,10 @@ module type METRICS = sig
       reference to file.fun_name in the database. *)
   val exist : string -> string -> bool
 
-  (** [generate_report name] builds a JSON report to [path]/name from the
-      values present in the database. It creates the path if it doesn't
-      exist. The default path is in [/tmp/oxymeter-report/]. *)
-  val generate_report : ?path:string -> string -> unit
-
-  val register_report_generation : unit -> unit
+  (** [generate_report path name] builds a JSON report to [path]/name from
+      the values present in the database. It creates the path if it doesn't
+      exist.*)
+  val generate_report : string -> string -> unit
 end
 
 (** Functor to create an instrument to get {!METRICS} from
