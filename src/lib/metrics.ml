@@ -51,7 +51,7 @@ end
 module EnergyMeasure : MEASURE = struct
   type t = Report.t
 
-  let file = "energy"
+  let file = "energy.json"
 
   let flag_on = ref false
 

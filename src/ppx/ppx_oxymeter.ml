@@ -1,14 +1,31 @@
 open Ppxlib
 open Tezos_oxymeter
 
+let time_header loc =
+  ( [ [%stri
+        at_exit (fun () ->
+            Tezos_oxymeter.Metrics.TimeMetrics.register_report_generation ())]
+    ],
+    [] )
+
+let energy_header loc =
+  ( [ [%stri
+        at_exit (fun () ->
+            Tezos_oxymeter.Metrics.EnergyMetrics.register_report_generation ())]
+    ],
+    [] )
+
+let merge_header time energy = (fst time @ fst energy, [])
+
 let header_insertion = function
   | None -> ([], [])
   | Some loc ->
-      ( [ [%stri
-            at_exit (fun () ->
-                Tezos_oxymeter.Metrics.TimeMetrics.register_report_generation ())]
-        ],
-        [] )
+      let time = if Args.want_time () then time_header loc else ([], []) in
+      let energy =
+        if Option.is_some (Args.want_power ()) then energy_header loc
+        else ([], [])
+      in
+      merge_header time energy
 
 let wrap_time_expr loc expr name =
   let fun_name = Ast_builder.Default.estring ~loc name in
