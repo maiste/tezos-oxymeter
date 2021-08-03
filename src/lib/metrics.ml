@@ -5,9 +5,7 @@ module type MEASURE = sig
 
   val file : string
 
-  val wanted : unit -> bool
-
-  val init : string option -> unit
+  val init : string list -> unit
 
   val getMeasure : unit -> t Lwt.t
 
@@ -31,11 +29,7 @@ module TimeMeasure : MEASURE = struct
 
   let file = "time.json"
 
-  let flag_on = ref false
-
-  let wanted () = !flag_on
-
-  let init _args = flag_on := Utils.Args.want_time ()
+  let init _args = ()
 
   let getMeasure () = Unix.gettimeofday () |> Lwt.return
 
@@ -51,19 +45,17 @@ module EnergyMeasure : MEASURE = struct
 
   let file = "energy.json"
 
-  let flag_on = ref false
-
-  let wanted () = !flag_on
+  let already_on = ref false
 
   let observer = ref Observer.Blind
 
-  let init _args =
-    match Utils.Args.want_power () with
-    | None -> ()
-    | Some power ->
-        flag_on := true ;
-        let obs = Observer.create (String.split_on_char ':' power) in
-        observer := obs
+  let init = function
+    | [ flags ] ->
+        if not !already_on then (
+          let obs = Observer.create (String.split_on_char ':' flags) in
+          observer := obs ;
+          already_on := true)
+    | _ -> ()
 
   let getMeasure () =
     let observer = !observer in

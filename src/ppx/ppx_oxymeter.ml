@@ -16,14 +16,16 @@ let time_header loc =
     ],
     [] )
 
-let energy_header loc =
+let energy_header loc power =
   let path =
     Ast_builder.Default.estring ~loc (Tezos_oxymeter.Args.want_path ())
   in
   let name =
     Ast_builder.Default.estring ~loc Tezos_oxymeter.Metrics.EnergyMeasure.file
   in
+  let args = Ast_builder.Default.estring ~loc power in
   ( [ [%stri
+        Tezos_oxymeter.Metrics.EnergyMeasure.init [ [%e args] ] ;
         at_exit (fun () ->
             Tezos_oxymeter.Metrics.EnergyMetrics.generate_report
               [%e path]
@@ -38,8 +40,10 @@ let header_insertion = function
   | Some loc ->
       let time = if Args.want_time () then time_header loc else ([], []) in
       let energy =
-        if Option.is_some (Args.want_power ()) then energy_header loc
-        else ([], [])
+        let power =
+          match Args.want_power () with None -> "off" | Some power -> power
+        in
+        if power <> "off" then energy_header loc power else ([], [])
       in
       merge_header time energy
 

@@ -6,11 +6,8 @@ module type MEASURE = sig
   (** The name of file where the measure are exported. *)
   val file : string
 
-  (** Tells if a measure is wanted or not. *)
-  val wanted : unit -> bool
-
   (** Initialize the instrument. *)
-  val init : string option -> unit
+  val init : string list -> unit
 
   (** Gets a measure. *)
   val getMeasure : unit -> t Lwt.t

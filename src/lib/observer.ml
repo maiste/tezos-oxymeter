@@ -21,18 +21,14 @@ module Mock = struct
     Lwt.return report
 end
 
-type observer =
-  | Blind
-  | Mock
-  | Smartpower of Smartpower.station Lwt.t
+type observer = Blind | Mock | Smartpower of Smartpower.station Lwt.t
 
 let create = function
-  | [] | ["off"] -> Blind
-  | ["mock"] -> Mock
-  | ["power" ; host ; port ] ->
-      let port = match int_of_string_opt port with
-      | Some port -> port
-      | None -> 23
+  | [] | [ "off" ] -> Blind
+  | [ "mock" ] -> Mock
+  | [ "power"; host; port ] ->
+      let port =
+        match int_of_string_opt port with Some port -> port | None -> 23
       in
       let station = Smartpower.create host port in
       Smartpower station
