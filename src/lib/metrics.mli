@@ -42,10 +42,15 @@ module type METRICS = sig
       reference to file.fun_name in the database. *)
   val exist : string -> string -> bool
 
-  (** [generate_report path name] builds a JSON report to [path]/name from
+  (** [generate_report path name] builds a JSON report to [path]/[name] from
       the values present in the database. It creates the path if it doesn't
       exist.*)
   val generate_report : string -> string -> unit
+
+  (** [generate_report_on_signal path name] is the same as {!generate_report}
+      with, in addition, a mecanism to refill the queue with a value. We want
+      to keep the report structure consistent. *)
+  val generate_report_on_signal : string -> string -> unit
 end
 
 (** Functor to create an instrument to get {!METRICS} from

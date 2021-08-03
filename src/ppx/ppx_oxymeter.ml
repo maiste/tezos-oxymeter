@@ -8,13 +8,12 @@ let time_header loc =
   let name =
     Ast_builder.Default.estring ~loc Tezos_oxymeter.Metrics.TimeMeasure.file
   in
-  ( [ [%stri
-        at_exit (fun () ->
-            Tezos_oxymeter.Metrics.TimeMetrics.generate_report
-              [%e path]
-              [%e name])]
-    ],
-    [] )
+  let exit_handler =
+    [%stri
+      at_exit (fun () ->
+          Tezos_oxymeter.Metrics.TimeMetrics.generate_report [%e path] [%e name])]
+  in
+  ([ exit_handler ], [])
 
 let energy_header loc power =
   let path =
@@ -24,16 +23,39 @@ let energy_header loc power =
     Ast_builder.Default.estring ~loc Tezos_oxymeter.Metrics.EnergyMeasure.file
   in
   let args = Ast_builder.Default.estring ~loc power in
-  ( [ [%stri
-        Tezos_oxymeter.Metrics.EnergyMeasure.init [ [%e args] ] ;
-        at_exit (fun () ->
-            Tezos_oxymeter.Metrics.EnergyMetrics.generate_report
-              [%e path]
-              [%e name])]
-    ],
-    [] )
+  let exit_handler =
+    [%stri
+      Tezos_oxymeter.Metrics.EnergyMeasure.init [ [%e args] ] ;
+      at_exit (fun () ->
+          Tezos_oxymeter.Metrics.EnergyMetrics.generate_report
+            [%e path]
+            [%e name])]
+  in
+  ([ exit_handler ], [])
 
-let merge_header time energy = (fst time @ fst energy, [])
+let signal_header loc =
+  if Args.want_signal () then
+    let time =
+      if Args.want_time () then [%expr Format.printf "Handler for TIME@."]
+      else [%expr Format.printf "No time signal handler.@."]
+    in
+    let power =
+      if Option.is_some (Args.want_power ()) then
+        [%expr Format.printf "Handler for POWER@."]
+      else [%expr Format.printf "No power signal handler.@."]
+    in
+    ( [ [%stri
+          Sys.signal
+            Sys.sigusr1
+            (Sys.Signal_handle
+               (fun _ ->
+                 [%e time] ;
+                 [%e power]))]
+      ],
+      [] )
+  else ([], [])
+
+let merge_header time energy signal = (fst time @ fst energy @ fst signal, [])
 
 let header_insertion = function
   | None -> ([], [])
@@ -45,23 +67,39 @@ let header_insertion = function
         in
         if power <> "off" then energy_header loc power else ([], [])
       in
-      merge_header time energy
+      let signal = signal_header loc in
+      merge_header time energy signal
 
+(* TODO: change save name with a random name *)
 let wrap_time_expr loc expr name =
   let fun_name = Ast_builder.Default.estring ~loc name in
   let file = Ast_builder.Default.estring ~loc loc.loc_start.pos_fname in
   [%expr
     Tezos_oxymeter.Metrics.TimeMetrics.insert [%e file] [%e fun_name] `Start ;
-    let save = [%e expr] in
+    let save =
+      try [%e expr]
+      with except ->
+        Tezos_oxymeter.Metrics.TimeMetrics.insert [%e file] [%e fun_name] `Stop ;
+        raise except
+    in
     Tezos_oxymeter.Metrics.TimeMetrics.insert [%e file] [%e fun_name] `Stop ;
     save]
 
+(* TODO: change save name with a random name *)
 let wrap_energy_expr loc expr name =
   let fun_name = Ast_builder.Default.estring ~loc name in
   let file = Ast_builder.Default.estring ~loc loc.loc_start.pos_fname in
   [%expr
     Tezos_oxymeter.Metrics.EnergyMetrics.insert [%e file] [%e fun_name] `Start ;
-    let save = [%e expr] in
+    let save =
+      try [%e expr]
+      with except ->
+        Tezos_oxymeter.Metrics.EnergyMetrics.insert
+          [%e file]
+          [%e fun_name]
+          `Stop ;
+        raise except
+    in
     Tezos_oxymeter.Metrics.EnergyMetrics.insert [%e file] [%e fun_name] `Stop ;
     save]
 

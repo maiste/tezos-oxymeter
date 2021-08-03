@@ -22,6 +22,8 @@ module type METRICS = sig
   val exist : string -> string -> bool
 
   val generate_report : string -> string -> unit
+
+  val generate_report_on_signal : string -> string -> unit
 end
 
 module TimeMeasure : MEASURE = struct
@@ -159,6 +161,18 @@ module MakeMetrics (M : MEASURE) : METRICS = struct
     @@ ( global_report >|= fun global_report ->
          let global_report = `O global_report in
          Utils.JSON.export_to ~path:json_path global_report )
+
+  let generate_report_on_signal path name =
+    Hashtbl.iter
+      (fun file functions ->
+        Hashtbl.iter (fun func _ -> insert file func `Stop) functions)
+      files ;
+    (* Here to ensure we stop the computation at this time. *)
+    generate_report path name ;
+    Hashtbl.iter
+      (fun file functions ->
+        Hashtbl.iter (fun func _ -> insert file func `Start) functions)
+      files
 end
 
 module TimeMetrics = MakeMetrics (TimeMeasure)
