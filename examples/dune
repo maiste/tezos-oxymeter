@@ -9,4 +9,4 @@
   (flags (:standard -w -49))
   (libraries tezos_oxymeter ppx-tezos_oxymeter)
   (modules example_ppx)
-  (preprocess (pps ppx-tezos_oxymeter -- -time -energy "mock")))
+  (preprocess (pps ppx-tezos_oxymeter -- -time -energy "mock" -signal )))
