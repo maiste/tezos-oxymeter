@@ -35,13 +35,29 @@ let energy_header loc power =
 
 let signal_header loc =
   if Args.want_signal () then
+    let path =
+      Ast_builder.Default.estring ~loc (Tezos_oxymeter.Args.want_path ())
+    in
+    let time_name =
+      Ast_builder.Default.estring ~loc Tezos_oxymeter.Metrics.TimeMeasure.file
+    in
     let time =
-      if Args.want_time () then [%expr Format.printf "Handler for TIME@."]
+      if Args.want_time () then
+        [%expr
+          Tezos_oxymeter.Metrics.TimeMetrics.generate_report_on_signal
+            [%e path]
+            [%e time_name]]
       else [%expr Format.printf "No time signal handler.@."]
+    in
+    let power_name =
+      Ast_builder.Default.estring ~loc Tezos_oxymeter.Metrics.EnergyMeasure.file
     in
     let power =
       if Option.is_some (Args.want_power ()) then
-        [%expr Format.printf "Handler for POWER@."]
+        [%expr
+          Tezos_oxymeter.Metrics.EnergyMetrics.generate_report_on_signal
+            [%e path]
+            [%e power_name]]
       else [%expr Format.printf "No power signal handler.@."]
     in
     ( [ [%stri
