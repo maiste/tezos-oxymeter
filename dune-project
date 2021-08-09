@@ -3,11 +3,9 @@
 
 (name tezos_oxymeter)
 (license MIT)
+(source (github maiste/tezos-oxymeter))
 (authors "Étienne Marais <etienne.marais@nomadic-labs.com")
 (maintainers "Étienne Marais <etienne.marais@nomadic-labs.com")
-(homepage "https://gitlab.com/maiste/tezos-oxymeter")
-(bug_reports "https://gitlab.com/maiste/tezos-oxymeter/-/issues")
-(source (uri "git+https://gitlab.com/maiste/tezos-oxymeter.git"))
 
 (package
  (name tezos_oxymeter)
