@@ -2,7 +2,6 @@
 (generate_opam_files true)
 
 (name tezos_oxymeter)
-(version ~dev)
 (license MIT)
 (authors "Étienne Marais <etienne.marais@nomadic-labs.com")
 (maintainers "Étienne Marais <etienne.marais@nomadic-labs.com")
