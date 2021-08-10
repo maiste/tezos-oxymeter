@@ -111,28 +111,26 @@ let header_insertion = function
       let signal = signal_header loc in
       merge_header time energy signal
 
-(* TODO: change save name with a random name *)
 let wrap_time_expr loc expr name =
   let fun_name = Ast_builder.Default.estring ~loc name in
   let file = Ast_builder.Default.estring ~loc loc.loc_start.pos_fname in
   [%expr
     Tezos_oxymeter.Metrics.TimeMetrics.insert [%e file] [%e fun_name] `Start ;
-    let save =
+    let oxymeter_save_my_return =
       try [%e expr]
       with except ->
         Tezos_oxymeter.Metrics.TimeMetrics.insert [%e file] [%e fun_name] `Stop ;
         raise except
     in
     Tezos_oxymeter.Metrics.TimeMetrics.insert [%e file] [%e fun_name] `Stop ;
-    save]
+    oxymeter_save_my_return]
 
-(* TODO: change save name with a random name *)
 let wrap_energy_expr loc expr name =
   let fun_name = Ast_builder.Default.estring ~loc name in
   let file = Ast_builder.Default.estring ~loc loc.loc_start.pos_fname in
   [%expr
     Tezos_oxymeter.Metrics.EnergyMetrics.insert [%e file] [%e fun_name] `Start ;
-    let save =
+    let oxymeter_save_my_return =
       try [%e expr]
       with except ->
         Tezos_oxymeter.Metrics.EnergyMetrics.insert
@@ -142,7 +140,7 @@ let wrap_energy_expr loc expr name =
         raise except
     in
     Tezos_oxymeter.Metrics.EnergyMetrics.insert [%e file] [%e fun_name] `Stop ;
-    save]
+    oxymeter_save_my_return]
 
 class oxymeter_mapper_v3 =
   object (_self)
