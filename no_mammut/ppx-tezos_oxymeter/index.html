@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title>index (ppx-tezos_oxymeter.index)</title><link rel="stylesheet" href="../odoc.css"/><meta charset="utf-8"/><meta name="generator" content="odoc 1.5.3"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/><script src="../highlight.pack.js"></script><script>hljs.initHighlightingOnLoad();</script></head><body><div class="content"><header><nav><a href="../index.html">Up</a> – ppx-tezos_oxymeter</nav><h1 id="top"><a href="#top" class="anchor"></a>Ppx-tezos_oxymeter</h1><p>The <code>ppx-tezos_oxymeter</code> is a tool that relies on <a href="../tezos_oxymeter/Tezos_oxymeter/index.html"><code>Tezos_oxymeter</code></a> to gather information about energy and time consumption. Its goal is to instrument the code easily and export the result as a report in JSON.</p><nav class="toc"><ul><li><a href="#code-instrumentation">Code instrumentation</a></li><li><a href="#arguments">Arguments</a></li><li><a href="#behaviour">Behaviour</a></li><li><a href="#report">Report</a></li></ul></nav></header><h2 id="code-instrumentation"><a href="#code-instrumentation" class="anchor"></a>Code instrumentation</h2><p>To instrument the code, you can describe the functions you want to select in a specific file thanks to a JSON:</p><pre><code class="ml">{
+  &quot;path/filename.ml&quot;: [
+    &quot;function_1&quot;,
+    &quot;function_2&quot;,
+    ...
+  ],
+  &quot;path/filename.ml&quot;: [
+    &quot;function_n&quot;,
+    ...
+  ]
+}</code></pre><p>Where the path is the one from the <code>dune-project</code> file. Indeed, this ppx relies on the <code>dune</code> to locate itself. The default file the ppx is about to check is <code>./metrics_config.json</code>. You can specific another file thanks to the variable <code>METRICS_CONFIG_PATH</code>.</p><h2 id="arguments"><a href="#arguments" class="anchor"></a>Arguments</h2><p>When you instrument your dune with the ppx, you can pass several options:</p><ul><li><code>-time</code> to get time metrics</li><li><p><code>-energy &lt;option&gt;</code> where option can be:</p><ul><li><code>&quot;mock&quot;</code> to turn on the mock observer.</li><li><code>&quot;power:&lt;ip&gt;:&lt;port&gt;&quot;</code> to turn on the smartpower observer on <code>ip</code>:<code>port</code>.</li></ul></li><li><code>-signal</code> to insert a signal handler</li><li><code>-path &lt;path&gt;</code> to specify a new path where to export the report.</li></ul><h2 id="behaviour"><a href="#behaviour" class="anchor"></a>Behaviour</h2><p>The instrumentation of the code while result in the following modification of your code:</p><pre><code class="ml">XMetrics.insert file.ml fun `Start;
+let var= fun () in
+XMetrics.insert file.ml fun `Stop;
+var</code></pre><p>where X is ether a <a href="../tezos_oxymeter/Tezos_oxymeter__/Metrics/TimeMetrics/index.html"><code>Tezos_oxymeter.Metrics.TimeMetrics</code></a> or a <a href="../tezos_oxymeter/Tezos_oxymeter__/Metrics/EnergyMetrics/index.html"><code>Tezos_oxymeter.Metrics.EnergyMetrics</code></a>.</p><p>It will also insert a piece of code in the header to build the report on signal (SIGUSR1) or when the program exits.</p><h2 id="report"><a href="#report" class="anchor"></a>Report</h2><p>This will generate a report in <code>/tmp/oxymeter-report/</code> where the report is a JSON. An example of a generated report for the time metrics is:</p><pre><code class="ml">[
+ {
+    &quot;hello_file.ml&quot;: {
+      &quot;hello&quot;: [
+        5.000241994857788 /* in seconds */
+      ]
+    }
+ }
+]</code></pre></div></body></html>
