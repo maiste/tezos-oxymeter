@@ -8,3 +8,6 @@
              lwt
              lwt.unix
              data-encoding))
+
+(documentation
+  (package tezos_oxymeter))
