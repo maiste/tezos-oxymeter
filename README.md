@@ -10,6 +10,8 @@ Tezos. It comes with two tools:
 This code is released during my internship at Nomadic Labs. It's a research
 project.
 
+The documentation is available [online](https://maiste.github.io/tezos-oxymeter/)
+
 ## Build the project
 
 To develop the project, you need to build.
