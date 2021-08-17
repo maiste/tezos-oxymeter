@@ -86,6 +86,8 @@ module Args = struct
 
   let path = ref "/tmp/oxymeter-report/"
 
+  let lwt_context = ref false
+
   let want_time () = !time
 
   let want_power () =
@@ -95,6 +97,8 @@ module Args = struct
   let want_signal () = !signal
 
   let want_path () = !path
+
+  let want_lwt () = !lwt_context
 
   let power_spec =
     ( "-energy",
@@ -110,4 +114,9 @@ module Args = struct
     ( "-path",
       Arg.Set_string path,
       "Specify a new path for the report. Default is /tmp/oxymeter-report." )
+
+  let lwt_spec =
+    ( "-lwt-context",
+      Arg.Set lwt_context,
+      "Specify if the ppx is executed in a PPX context or not." )
 end

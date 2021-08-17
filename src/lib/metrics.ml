@@ -42,13 +42,13 @@ module type MEASURE = sig
 end
 
 module type METRICS = sig
-  val insert : string -> string -> [< `Start | `Stop ] -> unit
+  val insert : string -> string -> [< `Start | `Stop ] -> unit Lwt.t
 
   val exist : string -> string -> bool
 
-  val generate_report : string -> string -> unit
+  val generate_report : string -> string -> unit Lwt.t
 
-  val generate_report_on_signal : string -> string -> unit
+  val generate_report_on_signal : string -> string -> unit Lwt.t
 end
 
 module TimeMeasure : MEASURE = struct
@@ -128,16 +128,15 @@ module MakeMetrics (M : MEASURE) : METRICS = struct
   let files : (string, functions) Hashtbl.t = build_new_archive_table ()
 
   let insert file fun_name state =
-    Lwt_main.run
-    @@ ( ( M.getMeasure () >|= fun measure ->
-           match state with `Start -> Start measure | `Stop -> Stop measure )
-       >|= fun metric ->
-         match Hashtbl.find_opt files file with
-         | Some functions -> (
-             match Hashtbl.find_opt functions fun_name with
-             | Some track -> Queue.push metric track
-             | None -> raise Not_found)
-         | None -> raise Not_found )
+    ( M.getMeasure () >|= fun measure ->
+      match state with `Start -> Start measure | `Stop -> Stop measure )
+    >|= fun metric ->
+    match Hashtbl.find_opt files file with
+    | Some functions -> (
+        match Hashtbl.find_opt functions fun_name with
+        | Some track -> Queue.push metric track
+        | None -> raise Not_found)
+    | None -> raise Not_found
 
   let exist file fun_name =
     match Hashtbl.find_opt files file with
@@ -182,22 +181,30 @@ module MakeMetrics (M : MEASURE) : METRICS = struct
         files
         (Lwt.return [])
     in
-    Lwt_main.run
-    @@ ( global_report >|= fun global_report ->
-         let global_report = `O global_report in
-         Utils.JSON.export_to ~path:json_path global_report )
+    global_report >|= fun global_report ->
+    let global_report = `O global_report in
+    Utils.JSON.export_to ~path:json_path global_report
 
   let generate_report_on_signal path name =
-    Hashtbl.iter
-      (fun file functions ->
-        Hashtbl.iter (fun func _ -> insert file func `Stop) functions)
-      files ;
-    (* Here to ensure we stop the computation at this time. *)
-    generate_report path name ;
-    Hashtbl.iter
-      (fun file functions ->
-        Hashtbl.iter (fun func _ -> insert file func `Start) functions)
+    Hashtbl.fold
+      (fun file functions state ->
+        Hashtbl.fold
+          (fun func _ state -> state >>= fun () -> insert file func `Stop)
+          functions
+          state)
       files
+      Lwt.return_unit
+    >>= fun () ->
+    (* Here to ensure we stop the computation at this time. *)
+    generate_report path name >>= fun () ->
+    Hashtbl.fold
+      (fun file functions state ->
+        Hashtbl.fold
+          (fun func _ state -> state >>= fun () -> insert file func `Start)
+          functions
+          state)
+      files
+      Lwt.return_unit
 end
 
 module TimeMetrics = MakeMetrics (TimeMeasure)

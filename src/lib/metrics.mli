@@ -63,7 +63,7 @@ module EnergyMeasure : MEASURE
 (** Module with informations about the time measure .*)
 module TimeMeasure : MEASURE
 
-(** {1 Metrics}
+(** {1 Metrics}seconde
 
     Metrics are the way to record measures until the end of the program or
     when a signal is triggered. *)
@@ -74,7 +74,7 @@ module type METRICS = sig
   (** [insert file fun_name state] inserts a new entry into
       the database, referenced as file.fun_name. It's either
       the starting of a measure or the end. *)
-  val insert : string -> string -> [< `Start | `Stop ] -> unit
+  val insert : string -> string -> [< `Start | `Stop ] -> unit Lwt.t
 
   (** [exist file fun_name] checks if there is already a
       reference to file.fun_name in the database. *)
@@ -83,12 +83,12 @@ module type METRICS = sig
   (** [generate_report path name] builds a JSON report to [path]/[name] from
       the values present in the database. It creates the path if it doesn't
       exist.*)
-  val generate_report : string -> string -> unit
+  val generate_report : string -> string -> unit Lwt.t
 
   (** [generate_report_on_signal path name] is the same as {!generate_report}
       with, in addition, a mecanism to refill the queue with a value. We want
       to keep the report structure consistent. *)
-  val generate_report_on_signal : string -> string -> unit
+  val generate_report_on_signal : string -> string -> unit Lwt.t
 end
 
 (** Functor to create an instrument to get {!METRICS} from

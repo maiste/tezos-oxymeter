@@ -89,6 +89,9 @@ module Args : sig
   (** [want_path ()] returns the path value. Default is /tmp/oxymeter-report. *)
   val want_path : unit -> string
 
+  (** [want_lwt ()] returns true if you need a Lwt context. *)
+  val want_lwt : unit -> bool
+
   (** {1 Specifications} *)
 
   (** Specification for a potential power argument in command line. *)
@@ -102,4 +105,7 @@ module Args : sig
 
   (** Specification for a potential path argument in command line. *)
   val path_spec : string * Arg.spec * string
+
+  (** Specification for a potential lwt-context argument in command line. *)
+  val lwt_spec : string * Arg.spec * string
 end
