@@ -40,6 +40,8 @@ When you instrument your dune with the ppx, you can pass several options:
 }
 - [-signal] to insert a signal handler
 - [-path <path>] to specify a new path where to export the report.
+- [-lwt-context] to add a [Lwt_main.run] when needed to ensure [Lwt] promises
+are executed because in a non [Lwt] program. /!\ Don't use it if you are already in an [Lwt] context.
 
 {1 Behaviour}
 

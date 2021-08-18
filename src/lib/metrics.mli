@@ -63,7 +63,7 @@ module EnergyMeasure : MEASURE
 (** Module with informations about the time measure .*)
 module TimeMeasure : MEASURE
 
-(** {1 Metrics}seconde
+(** {1 Metrics}
 
     Metrics are the way to record measures until the end of the program or
     when a signal is triggered. *)
