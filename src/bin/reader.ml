@@ -1,20 +1,42 @@
-let ( >>= ) = Result.bind
+(*****************************************************************************)
+(* Open Source License                                                       *)
+(* Copyright (c) 2021 Étienne Marais <etienne.marais@nomadic-labs.com>       *)
+(* Copyright (c) 2021 Nomadic Labs, <contact@nomadic-labs.com>               *)
+(*                                                                           *)
+(* Permission is hereby granted, free of charge, to any person obtaining a   *)
+(* copy of this software and associated documentation files (the "Software"),*)
+(* to deal in the Software without restriction, including without limitation *)
+(* the rights to use, copy, modify, merge, publish, distribute, sublicense,  *)
+(* and/or sell copies of the Software, and to permit persons to whom the     *)
+(* Software is furnished to do so, subject to the following conditions:      *)
+(*                                                                           *)
+(* The above copyright notice and this permission notice shall be included   *)
+(* in all copies or substantial portions of the Software.                    *)
+(*                                                                           *)
+(* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR*)
+(* IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,  *)
+(* FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL   *)
+(* THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER*)
+(* LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING   *)
+(* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER       *)
+(* DEALINGS IN THE SOFTWARE.                                                 *)
+(*                                                                           *)
+(*****************************************************************************)
 
-let ( let* ) = Result.bind
+open Utils.Infix
 
 module Info = struct
-  type category = Energy | Time
+  type measure = Energy | Time
 
-  type t =
-    { date : string; time : string; category : category; json : Ezjsonm.t }
+  type t = { date : string; time : string; measure : measure; json : Ezjsonm.t }
 
-  let create ~date ~time category json = { date; time; category; json }
+  let create ~date ~time measure json = { date; time; measure; json }
 
   let date { date; _ } = date
 
   let time { time; _ } = time
 
-  let category { category; _ } = category
+  let measure { measure; _ } = measure
 
   let json { json; _ } = json
 end
@@ -82,7 +104,7 @@ let extract_data_from_r path =
     let path = Filename.concat path l in
     acc >>= fun acc ->
     let* info = extract_info_r path in
-    match info.category with
+    match info.measure with
     | Energy -> Result.ok Data.{ acc with energy = info :: acc.energy }
     | Time -> Result.ok Data.{ acc with time = info :: acc.time }
   in
