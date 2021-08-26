@@ -1,4 +1,5 @@
 open Cmdliner
+open Utils.Infix
 
 let term_of_result = function
   | Result.Ok r -> `Ok r
@@ -24,10 +25,9 @@ let copts_t =
   Term.(const copts $ verbose $ path)
 
 let show copts =
-  let open Reader in
   let verbose = copts.verbose in
-  extract_data_from copts.path
-  >>= (fun data -> debug_data ~verbose data |> Result.ok)
+  Reader.extract_data_from_r copts.path
+  >>= (fun data -> Printer.show_data ~verbose data |> Result.ok)
   |> term_of_result
 
 let show_cmd =

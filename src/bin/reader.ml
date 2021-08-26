@@ -2,17 +2,32 @@ let ( >>= ) = Result.bind
 
 let ( let* ) = Result.bind
 
-type category = Energy | Time
+module Info = struct
+  type category = Energy | Time
 
-type info =
-  { date : string; time : string; category : category; json : Ezjsonm.t }
+  type t =
+    { date : string; time : string; category : category; json : Ezjsonm.t }
 
-let create_res_info date time category json =
-  Result.ok { date; time; category; json }
+  let create ~date ~time category json = { date; time; category; json }
 
-type data = { energy : info list; time : info list }
+  let date { date; _ } = date
 
-let empty_res_data = Result.ok { energy = []; time = [] }
+  let time { time; _ } = time
+
+  let category { category; _ } = category
+
+  let json { json; _ } = json
+end
+
+module Data = struct
+  type t = { energy : Info.t list; time : Info.t list }
+
+  let empty = { energy = []; time = [] }
+
+  let energy { energy; _ } = energy
+
+  let time { time; _ } = time
+end
 
 let open_opt file =
   try open_in file |> Result.ok
@@ -41,7 +56,7 @@ let is_well_format file =
   in
   Re.Pcre.pmatch ~rex file
 
-let extract_info path =
+let extract_info_r path =
   let file = Filename.basename path in
   if is_well_format file then
     let* json = get_json_from path in
@@ -49,8 +64,10 @@ let extract_info path =
     match String.split_on_char '-' name with
     | [ date; tail ] -> (
         match String.split_on_char '_' tail with
-        | [ time; "energy" ] -> create_res_info date time Energy json
-        | [ time; "time" ] -> create_res_info date time Time json
+        | [ time; "energy" ] ->
+            Info.create ~date ~time Info.Energy json |> Result.ok
+        | [ time; "time" ] ->
+            Info.create ~date ~time Info.Time json |> Result.ok
         | _ -> Result.error "Sorry, your file is not well-formatted.")
     | _ -> Result.error "Sorry, your file is not well-formatted."
   else
@@ -58,31 +75,15 @@ let extract_info path =
       "Your file is not well-formatted: it should be \
        YYYYMMDD-HH:MM:SS_[energy|time].json"
 
-let extract_data_from path =
+let extract_data_from_r path =
   let* dir = enumerate_files path in
   let dir = Array.to_list dir in
   let iterator acc l =
     let path = Filename.concat path l in
     acc >>= fun acc ->
-    let* info = extract_info path in
+    let* info = extract_info_r path in
     match info.category with
-    | Energy -> Result.ok { acc with energy = info :: acc.energy }
-    | Time -> Result.ok { acc with time = info :: acc.time }
+    | Energy -> Result.ok Data.{ acc with energy = info :: acc.energy }
+    | Time -> Result.ok Data.{ acc with time = info :: acc.time }
   in
-  List.fold_left iterator empty_res_data dir
-
-let debug_info ?(verbose = false) { date; time; category; json } =
-  let json_s =
-    if verbose then Format.sprintf "%s\n" (Ezjsonm.to_string ~minify:true json)
-    else ""
-  in
-  match category with
-  | Energy -> Format.printf "- %s %s\n%s" date time json_s
-  | Time -> Format.printf "- %s %s\n%s" date time json_s
-
-let debug_data ?(verbose = false) data =
-  Format.printf "=== Energy data ===\n" ;
-  List.iter (debug_info ~verbose) data.energy ;
-  Format.printf "===  Time data  ===\n" ;
-  List.iter (debug_info ~verbose) data.time ;
-  Format.printf "===================@."
+  List.fold_left iterator (Result.ok Data.empty) dir
