@@ -24,23 +24,48 @@
 (*****************************************************************************)
 
 open Reader
+open Utils.Unix
 
-let show_info ?(verbose = false) info =
+let to_string_info ?(verbose = false) info =
   let date = Info.date info in
   let time = Info.time info in
   let measure = Info.measure info in
   let json = Info.json info in
   let json_s =
-    if verbose then Format.sprintf "%s\n" (Ezjsonm.to_string ~minify:true json)
+    if verbose then Format.sprintf "%s\n" (Ezjsonm.to_string ~minify:false json)
     else ""
   in
   match measure with
-  | Energy -> Format.printf "- %s %s\n%s" date time json_s
-  | Time -> Format.printf "- %s %s\n%s" date time json_s
+  | Energy -> Format.sprintf "- %s %s\n%s" date time json_s
+  | Time -> Format.sprintf "- %s %s\n%s" date time json_s
 
-let show_data ?(verbose = false) data =
-  Format.printf "=== Energy data ===\n" ;
-  List.iter (show_info ~verbose) (Data.energy data) ;
-  Format.printf "===  Time data  ===\n" ;
-  List.iter (show_info ~verbose) (Data.time data) ;
-  Format.printf "===================@."
+let to_string_data ?verbose data =
+  let energy_head = Format.sprintf "=== Energy data ===\n" in
+  let energy_data =
+    List.fold_left
+      (fun acc info -> acc ^ to_string_info ?verbose info)
+      energy_head
+      (Data.energy data |> List.rev)
+  in
+  let time_head = Format.sprintf "===  Time data  ===\n" in
+  let time_data =
+    List.fold_left
+      (fun acc info -> acc ^ to_string_info ?verbose info)
+      time_head
+      (Data.time data |> List.rev)
+  in
+  let time_data = time_data ^ Format.sprintf "===================\n" in
+  energy_data ^ time_data
+
+let show_info ?verbose info = Format.printf "%s" (to_string_info ?verbose info)
+
+let show_data ?verbose data =
+  Format.printf "%s@." (to_string_data ?verbose data)
+
+let export ?(verbose = false) path data =
+  if Filename.dirname path |> check_dir then (
+    let cout = open_out path in
+    if verbose then show_data ~verbose:false data ;
+    output_string cout (to_string_data ~verbose:true data) ;
+    Result.ok (close_out cout))
+  else Result.error "Sorry, we can't export to this directory"

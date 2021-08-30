@@ -24,6 +24,7 @@
 (*****************************************************************************)
 
 open Utils.Infix
+open Utils.Unix
 
 module Info = struct
   type measure = Energy | Time
@@ -63,20 +64,6 @@ let get_json_from file =
     res
   with Ezjsonm.Parse_error _ ->
     Result.error "Sorry, we are not able to parse the JSON file."
-
-let check_dir dir = Sys.file_exists dir && Sys.is_directory dir
-
-let enumerate_files path =
-  if check_dir path then
-    try Sys.readdir path |> Result.ok
-    with _ -> Result.error "Sorry, we can't read the directory you specified."
-  else Result.error "Sorry, the path you specify is not an existing directory."
-
-let is_well_format file =
-  let rex =
-    Re.Pcre.regexp "^[0-9]{8}-[0-9]{2}:[0-9]{2}:[0-9]{2}_(energy|time).json$"
-  in
-  Re.Pcre.pmatch ~rex file
 
 let extract_info_r path =
   let file = Filename.basename path in

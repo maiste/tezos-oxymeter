@@ -35,3 +35,8 @@ val show_info : ?verbose:bool -> Info.t -> unit
 (** [show_data data] displays the information contained in [data]. If verbose
     is set to true, it adds the JSON information. *)
 val show_data : ?verbose:bool -> Data.t -> unit
+
+(** [export ~verbose path data] exports the [data] to [path]. If the path is
+    wrong, it returns a {!Result.Error}. If verbose is activated, it displays
+    the reports that are going to be exported. *)
+val export : ?verbose:bool -> string -> Data.t -> (unit, string) result
