@@ -61,7 +61,24 @@ let show_cmd =
   let exits = Term.default_exits in
   (Term.(const show $ copts_t), Term.info "show" ~doc ~sdocs ~exits)
 
-let cmds = [ show_cmd ]
+let export copts path =
+  let verbose = copts.verbose in
+  Reader.extract_data_from_r copts.path
+  >>= (fun data -> Printer.export ~verbose path data)
+  |> term_of_result
+
+let export_cmd =
+  let doc = "Export reports in one file in a readable format." in
+  let path =
+    let doc = "Specify the path where to export." in
+    Arg.(
+      required & pos ~rev:true 0 (some string) None & info [] ~docv:"PATH" ~doc)
+  in
+  let sdocs = Manpage.s_common_options in
+  let exits = Term.default_exits in
+  (Term.(const export $ copts_t $ path), Term.info "export" ~doc ~sdocs ~exits)
+
+let cmds = [ show_cmd; export_cmd ]
 
 let default_cmd =
   let doc = "an explorer for ppx-tezos_oxymeter results" in
