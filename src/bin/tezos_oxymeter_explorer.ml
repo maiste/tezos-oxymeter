@@ -26,11 +26,13 @@
 open Cmdliner
 open Utils.Infix
 
+type copts = { verbose : bool; path : string }
+
+type measure = Reader.Info.measure = Energy | Time
+
 let term_of_result = function
   | Result.Ok r -> `Ok r
   | Error e -> `Error (false, e)
-
-type copts = { verbose : bool; path : string }
 
 let copts verbose path = { verbose; path }
 
@@ -78,7 +80,37 @@ let export_cmd =
   let exits = Term.default_exits in
   (Term.(const export $ copts_t $ path), Term.info "export" ~doc ~sdocs ~exits)
 
-let cmds = [ show_cmd; export_cmd ]
+let explore copts date time measure =
+  let verbose = copts.verbose in
+  Reader.extract_data_from_r copts.path
+  >>= (fun data ->
+        Printer.show_filter_data ~verbose ~date ~time ~measure data |> Result.ok)
+  |> term_of_result
+
+let explore_cmd =
+  let doc = "Explore report generated." in
+  let date =
+    let doc = "Specify a date to seach in reports. The format is YYYYMMJJ." in
+    Arg.(value & opt (some string) None & info [ "d"; "date" ] ~doc)
+  in
+  let time =
+    let doc = "Specify a time to seach in reports. The format is HH:MM:SS." in
+    Arg.(value & opt (some string) None & info [ "t"; "time" ] ~doc)
+  in
+  let measure =
+    let doc =
+      "Specify a measure you want to get. The measures available are Time and \
+       Energy."
+    in
+    let measure = Arg.enum [ ("energy", Energy); ("time", Time) ] in
+    Arg.(value & opt (some measure) None & info [ "m"; "measure" ] ~doc)
+  in
+  let sdocs = Manpage.s_common_options in
+  let exits = Term.default_exits in
+  ( Term.(const explore $ copts_t $ date $ time $ measure),
+    Term.info "explore" ~doc ~sdocs ~exits )
+
+let cmds = [ show_cmd; export_cmd; explore_cmd ]
 
 let default_cmd =
   let doc = "an explorer for ppx-tezos_oxymeter results" in
