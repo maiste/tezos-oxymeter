@@ -47,6 +47,10 @@ module Data = struct
 
   let empty = { energy = []; time = [] }
 
+  let set_energy energy data = { data with energy }
+
+  let set_time time data = { data with time }
+
   let energy { energy; _ } = energy
 
   let time { time; _ } = time

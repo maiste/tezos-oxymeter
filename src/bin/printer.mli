@@ -36,6 +36,15 @@ val show_info : ?verbose:bool -> Info.t -> unit
     is set to true, it adds the JSON information. *)
 val show_data : ?verbose:bool -> Data.t -> unit
 
+(** [show_filter_data ~date ~time ~measure data] *)
+val show_filter_data :
+  ?verbose:bool ->
+  date:string option ->
+  time:string option ->
+  measure:Reader.Info.measure option ->
+  Data.t ->
+  unit
+
 (** [export ~verbose path data] exports the [data] to [path]. If the path is
     wrong, it returns a {!Result.Error}. If verbose is activated, it displays
     the reports that are going to be exported. *)

@@ -32,7 +32,7 @@ module Info : sig
   type t
 
   (** A type selector to describ the type of measure made. *)
-  type measure = private Energy | Time
+  type measure = Energy | Time
 
   (** [create ~date ~time measure json] a new {!t}. *)
   val create : date:string -> time:string -> measure -> Ezjsonm.t -> t
@@ -63,6 +63,12 @@ module Data : sig
 
   (** Gets the list of the time reports. *)
   val time : t -> Info.t list
+
+  (** Sets the time value contains in data. *)
+  val set_time : Info.t list -> t -> t
+
+  (** Sets the energy value contains in data. *)
+  val set_energy : Info.t list -> t -> t
 end
 
 (** [extract_data_from_r path] extracts the data in the directory specify by
