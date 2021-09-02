@@ -40,22 +40,28 @@ let to_string_info ?(verbose = false) info =
   | Time -> Format.sprintf "- %s %s\n%s" date time json_s
 
 let to_string_data ?verbose data =
-  let energy_head = Format.sprintf "=== Energy data ===\n" in
-  let energy_data =
-    List.fold_left
-      (fun acc info -> acc ^ to_string_info ?verbose info)
-      energy_head
-      (Data.energy data |> List.rev)
+  let energy_str =
+    let energy = Data.energy data in
+    if energy <> [] then
+      let energy_head = Format.sprintf "=== Energy data ===\n" in
+      List.fold_left
+        (fun acc info -> acc ^ to_string_info ?verbose info)
+        energy_head
+        (energy |> List.rev)
+    else ""
   in
-  let time_head = Format.sprintf "===  Time data  ===\n" in
-  let time_data =
-    List.fold_left
-      (fun acc info -> acc ^ to_string_info ?verbose info)
-      time_head
-      (Data.time data |> List.rev)
+  let time_str =
+    let time = Data.time data in
+    if time <> [] then
+      let time_head = Format.sprintf "===  Time data  ===\n" in
+      List.fold_left
+        (fun acc info -> acc ^ to_string_info ?verbose info)
+        time_head
+        (Data.time data |> List.rev)
+    else ""
   in
-  let time_data = time_data ^ Format.sprintf "===================\n" in
-  energy_data ^ time_data
+  let footer = "====================\n" in
+  energy_str ^ time_str ^ footer
 
 let show_info ?verbose info = Format.printf "%s" (to_string_info ?verbose info)
 
