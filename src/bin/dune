@@ -1,0 +1,9 @@
+(executable
+  (public_name tzoexplorer)
+  (name tezos_oxymeter_explorer)
+  (package ppx-tezos_oxymeter)
+  (libraries tezos_oxymeter
+             re
+             cmdliner
+             ezjsonm))
+

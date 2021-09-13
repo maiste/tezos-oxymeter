@@ -23,8 +23,13 @@
 (*                                                                           *)
 (*****************************************************************************)
 
-(** Utilities used by the entire library to represent a report. Once it's
+(** Utility used by the entire library to represent a report. Once it's
     created, it can't be ereased. *)
+
+(** {1 Representation}
+
+    A report is a representation of the state of an {!Observer.observer}
+    at a given time. *)
 
 (** Abstract representation for a report. To get the content, it's recommanded
     to use the encoding system. *)
@@ -48,12 +53,35 @@ val create :
   float ->
   t
 
-(** It provides an encoding used by tezos to transform data in JSON format. *)
-val encoding : t Data_encoding.t
+(** {1 Manipulation}
+
+    Even if the {!t} type is immutable, you can execute some actions on
+    it and generates new reports. *)
+
+(**  [diff r1 r2] creates a new report which represents the difference
+      between the two reports (r1 - r2), field by field. *)
+val diff : t -> t -> t
 
 (** [pp ppf report] is used to pretty print the report. *)
 val pp : Format.formatter -> t -> unit
 
-(** [json_of_t report] converts a {!t} report into a Json, usable by
+(** {1 Conversion}
+
+    The report can convert to various to be:
+    - send through the network
+    - print as a string
+    - use as a normalize representation *)
+
+(** It provides an encoding used by tezos to transform data in JSON format. *)
+val encoding : t Data_encoding.t
+
+(** [string_ot_t] converts {!t} report into a readable string. *)
+val string_of_t : t -> string
+
+(** [json_of_t report] converts a {!t} report into a JSON, usable by
     Data_encoding. *)
 val json_of_t : t -> Data_encoding.json
+
+(** [ezjsonm_of_t report] converts {!t} report into a JSON, usable bytes
+    Ezjsonm. *)
+val ezjsonm_of_t : t -> Ezjsonm.value

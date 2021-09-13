@@ -23,11 +23,29 @@
 (*                                                                           *)
 (*****************************************************************************)
 
-(** Main module for the [Tezos_oxymeter]. It exposes the different modules and
-    wrap the behaviour for the energy consumption observation. *)
+(** The Reader module exposes functions to show information and exports
+    data to file. *)
 
-(** Wrapper for the {!Report} module. *)
-module Report = Report
+open Reader
 
-(** Wrapper for the {!Observer} module. *)
-module Observer = Observer
+(** [show_info info] displays the information contained in [info]. If verbose
+    is set to true, it adds the JSON information. *)
+val show_info : ?verbose:bool -> Info.t -> unit
+
+(** [show_data data] displays the information contained in [data]. If verbose
+    is set to true, it adds the JSON information. *)
+val show_data : ?verbose:bool -> Data.t -> unit
+
+(** [show_filter_data ~date ~time ~measure data] *)
+val show_filter_data :
+  ?verbose:bool ->
+  date:string option ->
+  time:string option ->
+  measure:Reader.Info.measure option ->
+  Data.t ->
+  unit
+
+(** [export ~verbose path data] exports the [data] to [path]. If the path is
+    wrong, it returns a {!Result.Error}. If verbose is activated, it displays
+    the reports that are going to be exported. *)
+val export : ?verbose:bool -> string -> Data.t -> (unit, string) result

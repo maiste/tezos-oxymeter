@@ -29,14 +29,7 @@ let observe_mock () =
   (Observer.observe obs >|= fun json -> Observer.to_string json) >|= fun str ->
   Format.printf "%s@." str
 
-let observe_mammut () =
-  let obs = Observer.Mammut None in
-  let () = Format.printf "Observe mammut@." in
-  (Observer.observe obs >|= fun json -> Observer.to_string json) >|= fun str ->
-  Format.printf "%s@." str
-
 let () =
   Lwt_main.run @@ observe_blind () ;
   Lwt_main.run @@ observe_mock ()
 (*Lwt_main.run @@ observe_smart () ;*)
-(*Lwt_main.run @@ observe_mammut ();*)

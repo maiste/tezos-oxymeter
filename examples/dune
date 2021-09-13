@@ -1,6 +1,13 @@
 (executable
-  (name main)
-  (flags (:standard -w -49
-                    -cclib -lusb-1.0
-   ))
+  (name example_oxymeter)
+  (flags (:standard -w -49))
+  (modules example_oxymeter)
   (libraries tezos_oxymeter))
+
+(executable
+  (name example_ppx)
+  (flags (:standard -w -49))
+  (libraries tezos_oxymeter ppx-tezos_oxymeter lwt)
+  (modules example_ppx)
+  (preprocess
+    (pps ppx-tezos_oxymeter -- -time -energy "mock" -lwt-context -signal)))

@@ -1,0 +1,78 @@
+{0:top Ppx-tezos_oxymeter}
+
+The [ppx-tezos_oxymeter] is a tool that relies on {!Tezos_oxymeter} to
+gather information about energy and time consumption. Its goal is to
+instrument the code easily and export the result as a report in JSON.
+
+{1 Code instrumentation}
+
+To instrument the code, you can describe the functions you want to select in
+a specific file thanks to a JSON:
+
+{[
+  {
+    "path/filename.ml": [
+      "function_1",
+      "function_2",
+      ...
+    ],
+    "path/filename.ml": [
+      "function_n",
+      ...
+    ]
+  }
+]}
+
+Where the path is the one from the [dune-project] file. Indeed, this ppx relies
+on the [dune] to locate itself. The default file the ppx is about to check is
+[./metrics_config.json]. You can specific another file thanks to the variable
+[METRICS_CONFIG_PATH].
+
+{1 Arguments}
+
+When you instrument your dune with the ppx, you can pass several options:
+- [-time] to get time metrics
+- [-energy <option>] where option can be:
+{ul
+  {- ["mock"] to turn on the mock observer.}
+  {- ["power:<ip>:<port>"] to turn on the smartpower observer on
+      [ip]:[port].}
+}
+- [-signal] to insert a signal handler
+- [-path <path>] to specify a new path where to export the report.
+- [-lwt-context] to add a [Lwt_main.run] when needed to ensure [Lwt] promises
+are executed because in a non [Lwt] program. /!\ Don't use it if you are already in an [Lwt] context.
+
+{1 Behaviour}
+
+The instrumentation of the code while result in the following modification of
+your code:
+
+{[
+    XMetrics.insert file.ml fun `Start;
+    let var= fun () in
+    XMetrics.insert file.ml fun `Stop;
+    var
+]}
+
+where X is ether a {!Tezos_oxymeter.Metrics.TimeMetrics} or a
+{!Tezos_oxymeter.Metrics.EnergyMetrics}.
+
+It will also insert a piece of code in the header to build the report on signal
+(SIGUSR1) or when the program exits.
+
+{1 Report}
+
+This will generate a report in [/tmp/oxymeter-report/] where the report is a
+JSON. An example of a generated report for the time metrics is:
+{[
+[
+ {
+    "hello_file.ml": {
+      "hello": [
+        5.000241994857788 /* in seconds */
+      ]
+    }
+ }
+]
+]}

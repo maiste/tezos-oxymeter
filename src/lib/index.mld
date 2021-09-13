@@ -1,0 +1,32 @@
+{0:top Tezos-oxymeter}
+
+Tezos-oxymeter is a library to wrap calls to energy consumption metrics. The
+purpose is to hide the logic behind the library and provide an interface easy
+to use.
+
+{1 Reporting data}
+
+When you execute an observation, you get data as a {!Tezos_oxymeter.Report.t}.
+All the description you need to manipulate it and print it are located in the
+module {!Tezos_oxymeter.Report}.
+
+
+{1 Observing instruments}
+
+This is the main part of the lib. The {!Tezos_oxymeter.Observer} module
+centralize all the way you have to gather information from an instrument
+to observe the consumption. The instruments available are desribed as
+{!Tezos_oxymeter.Observer.observer}.
+
+
+{1 Gather information as metrics}
+
+If you want to track the consumption, you need to get the information from
+observers regularly. To handle the creation and the manipulation of such a
+structure, there is the {!Tezos_oxymeter.Metrics} module.
+
+
+{1 Parameters definitions}
+
+As you might need some information in the commandline to be parsed and be
+accessible easily, you have the {!Tezos_oxymeter.Args} module.

@@ -23,7 +23,26 @@
 (*                                                                           *)
 (*****************************************************************************)
 
-(** [observe ()] creates a request to MSR register and return a {!type:Report.t}
-    wrap into the {!Lwt} monad.
-*)
-val observe : unit -> Report.t Lwt.t
+module Infix = struct
+  let ( >>= ) = Result.bind
+
+  let ( let* ) = Result.bind
+end
+
+module Unix = struct
+  let check_dir dir = Sys.file_exists dir && Sys.is_directory dir
+
+  let enumerate_files path =
+    if check_dir path then
+      try Sys.readdir path |> Result.ok
+      with _ ->
+        Result.error "Sorry, we can't read the directory you specified."
+    else
+      Result.error "Sorry, the path you specify is not an existing directory."
+
+  let is_well_format file =
+    let rex =
+      Re.Pcre.regexp "^[0-9]{8}-[0-9]{2}:[0-9]{2}:[0-9]{2}_(energy|time).json$"
+    in
+    Re.Pcre.pmatch ~rex file
+end

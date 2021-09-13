@@ -23,6 +23,16 @@
 (*                                                                           *)
 (*****************************************************************************)
 
+(** Main module for the [Tezos_oxymeter]. It exposes the different modules and
+    wrap the behaviour for the energy consumption observation. *)
+
 module Report = Report
 module Observer = Observer
+module Metrics = Metrics
 
+(** This module provides variables usable as arguments for the {!Arg}
+    module. *)
+module Args = struct
+  (** @inline *)
+  include Utils.Args
+end
